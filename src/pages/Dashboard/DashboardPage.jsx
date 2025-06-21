@@ -1,62 +1,68 @@
-import { Grid } from '@mui/material';
-import { Card } from '../../components/ui/card';
-import { SummaryCard } from '../../components/cards/SummaryCard';
-import { IncomeChart } from '../../components/charts/IncomeChart';
-// import { RecentTransactions } from '../../components/transactions/RecentTransactions';
+/* eslint-disable no-unused-vars */
+// pages/Dashboard/DashboardPage.jsx
+import { motion } from 'framer-motion';
+import { IncomeCard } from '../../components/cards/IncomeCard';
+import { OutcomeCard } from '../../components/cards/OutcomeCard';
 
 export const DashboardPage = () => {
   // Données temporaires - à remplacer par vos appels API
-  const summaryData = {
-    balance: 4544,
-    income: 980,
-    expenses: 460,
+  const todayData = {
+    income: 13910,
+    incomePercentage: '+2.4%',
+    outcome: 10067,
+    outcomePercentage: '-1.2%',
   };
 
-  // const transactions = [
-  //   { id: 1, name: 'Ahn Balarine', amount: 12599, type: 'income', date: '2022-06-10' },
-  //   { id: 2, name: 'James Johnny', amount: 635, type: 'expense', date: '2022-06-10' },
-  // ];
-
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Welcome back</h1>
-      <p className="text-gray-600">Here's your most recent summary</p>
+    <div className="bg-black-100 p-0">
+      <motion.div className="max-w-7xl mx-auto space-y-8">
+        {/* Header Section (gardez votre code existant) */}
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={4}>
-          <SummaryCard
-            title="Balance"
-            value={`$${summaryData.balance.toLocaleString()}`}
-            trend={{ value: '2.4%', direction: 'up' }}
+        {/* Stats Cards Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <IncomeCard 
+            amount={todayData.income} 
+            percentage={todayData.incomePercentage} 
           />
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <SummaryCard
-            title="Income"
-            value={`$${summaryData.income.toLocaleString()}`}
-            trend={{ value: '24%', direction: 'up' }}
+          <OutcomeCard 
+            amount={todayData.outcome} 
+            percentage={todayData.outcomePercentage} 
           />
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <SummaryCard
-            title="Expenses"
-            value={`$${summaryData.expenses.toLocaleString()}`}
-            trend={{ value: '3.4%', direction: 'down' }}
-          />
-        </Grid>
+          {/* Ajoutez deux cartes supplémentaires ici */}
+        </div>
 
-        <Grid item xs={12} lg={8}>
-          <Card className="h-full">
-            <IncomeChart data={summaryData} />
-          </Card>
-        </Grid>
+        {/* Graph Section */}
+        <div className="bg-white p-6 rounded-2xl shadow-lg">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold">Monthly Overview</h2>
+            <select className="bg-gray-100 px-4 py-2 rounded-lg">
+              <option>November 2023</option>
+            </select>
+          </div>
+          {/* Ici vous ajouterez votre composant de graphique */}
+        </div>
 
-        <Grid item xs={12} lg={4}>
-          <Card className="h-full">
-            {/* <RecentTransactions transactions={transactions} /> */}
-          </Card>
-        </Grid>
-      </Grid>
+        {/* Bottom Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Quick Transfer Section */}
+          <div className="bg-white p-6 rounded-2xl shadow-lg">
+            <h3 className="font-bold mb-4">Quick Transfer</h3>
+            {/* Liste des contacts */}
+          </div>
+
+          {/* My Wallets Section */}
+          <div className="bg-white p-6 rounded-2xl shadow-lg">
+            <h3 className="font-bold mb-4">My Wallets</h3>
+            {/* Liste des wallets */}
+          </div>
+
+          {/* Recent Transactions Section */}
+          <div className="bg-white p-6 rounded-2xl shadow-lg">
+            <h3 className="font-bold mb-4">Recent Transactions</h3>
+            {/* Liste des transactions */}
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 };

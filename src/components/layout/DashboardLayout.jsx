@@ -19,8 +19,9 @@ const getPageInfo = (pathname) => {
   return routes[pathname] || { title: 'Dashboard', subtitle: 'Welcome back!' };
 };
 
-export const DashboardLayout = ({ theme = 'light' }) => {
+export const DashboardLayout = ({ initialTheme = 'light' }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [theme, setTheme] = useState(initialTheme);
   const isMobile = useMediaQuery('(max-width: 768px)');
   const location = useLocation();
   
@@ -30,8 +31,20 @@ export const DashboardLayout = ({ theme = 'light' }) => {
     setMobileOpen(!mobileOpen);
   };
 
+  const handleThemeToggle = () => {
+    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
+  };
+
+  const isDark = theme === 'dark';
+  const backgroundColor = isDark ? '#0f0f0f' : '#fafbfc';
+
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: '#fafbfc' }}>
+    <Box sx={{ 
+      display: 'flex', 
+      minHeight: '100vh', 
+      backgroundColor: backgroundColor,
+      transition: 'background-color 0.3s ease'
+    }}>
       {/* Sidebar pour desktop */}
       {!isMobile && (
         <Box 
@@ -48,7 +61,7 @@ export const DashboardLayout = ({ theme = 'light' }) => {
             }
           }}
         >
-          <Sidebar variant={theme} />
+          <Sidebar variant={theme} onToggleTheme={handleThemeToggle} />
         </Box>
       )}
 
@@ -66,7 +79,7 @@ export const DashboardLayout = ({ theme = 'light' }) => {
           }
         }}
       >
-        <Sidebar variant={theme} />
+        <Sidebar variant={theme} onToggleTheme={handleThemeToggle} />
       </Drawer>
       
       {/* Contenu principal */}
@@ -82,6 +95,7 @@ export const DashboardLayout = ({ theme = 'light' }) => {
           onMenuClick={handleDrawerToggle}
           title={pageInfo.title}
           subtitle={pageInfo.subtitle}
+          theme={theme}
         />
         
         {/* Contenu de la page */}
@@ -90,8 +104,9 @@ export const DashboardLayout = ({ theme = 'light' }) => {
           sx={{ 
             flexGrow: 1,
             padding: { xs: 2, md: 3 },
-            backgroundColor: '#fafbfc',
-            overflow: 'auto'
+            backgroundColor: backgroundColor,
+            overflow: 'auto',
+            transition: 'background-color 0.3s ease'
           }}
         >
           <Outlet />
@@ -102,5 +117,5 @@ export const DashboardLayout = ({ theme = 'light' }) => {
 };
 
 DashboardLayout.propTypes = {
-  theme: PropTypes.oneOf(['light', 'dark']),
+  initialTheme: PropTypes.oneOf(['light', 'dark']),
 };

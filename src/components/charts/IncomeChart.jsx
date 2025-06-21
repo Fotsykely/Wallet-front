@@ -13,10 +13,14 @@ const data = [
 
 export const IncomeChart = () => {
   return (
-    <div className="h-[300px]">
+    <div className="h-[300px] w-[800px]">
       <h4 className="mb-4 font-medium">Financial Analytics</h4>
+      <div className="bg-red-500 text-white p-4">
+          Test Tailwind
+        </div>
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data}>
+        
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis dataKey="name" />
           <YAxis />
