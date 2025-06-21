@@ -1,7 +1,7 @@
 import { CallReceived } from '@mui/icons-material';
 import { StatCard } from '../ui/StatCard';
 
-export const IncomeCard = ({ amount, percentage, trend = 'up' }) => {
+export const IncomeCard = ({ amount, percentage, trend = 'up', className }) => {
   return (
     <StatCard
       title="Income"
@@ -10,6 +10,7 @@ export const IncomeCard = ({ amount, percentage, trend = 'up' }) => {
       trend={trend}
       icon={<CallReceived sx={{ fontSize: 24, color: '#16a34a' }} />}
       iconBgColor="#e6f7e6"
+      className={className}
     />
   );
 };

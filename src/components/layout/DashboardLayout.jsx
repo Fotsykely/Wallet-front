@@ -1,5 +1,5 @@
 import { Box, Drawer, useMediaQuery } from '@mui/material';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
@@ -21,9 +21,25 @@ const getPageInfo = (pathname) => {
 
 export const DashboardLayout = ({ initialTheme = 'light' }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [theme, setTheme] = useState(initialTheme);
   const isMobile = useMediaQuery('(max-width: 768px)');
   const location = useLocation();
+
+  const getInitialTheme = () => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('theme');
+      if (stored) return stored;
+      // Sinon, détecte le thème système
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      return prefersDark ? 'dark' : 'light';
+    }
+    return initialTheme;
+  };
+  const [theme, setTheme] = useState(getInitialTheme);
+
+  // Sauvegarder le thème à chaque changement
+  useEffect(() => {
+    localStorage.setItem('theme', theme);
+  }, [theme]);
   
   const pageInfo = getPageInfo(location.pathname);
 
@@ -109,7 +125,7 @@ export const DashboardLayout = ({ initialTheme = 'light' }) => {
             transition: 'background-color 0.3s ease'
           }}
         >
-          <Outlet />
+          <Outlet context={{ theme, isDark }} />
         </Box>
       </Box>
     </Box>
