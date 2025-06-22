@@ -36,13 +36,13 @@ AnimatedLine.propTypes = {
 };
 
 const data = [
-  { day: '24 Mar', Revenus: 15000, Dépenses: 5000, Épargne: 10000 },
-  { day: '25 Mar', Revenus: 18000, Dépenses: 8000, Épargne: 10000 },
-  { day: '26 Mar', Revenus: 16000, Dépenses: 7000, Épargne: 9000 },
-  { day: '27 Mar', Revenus: 20000, Dépenses: 9000, Épargne: 11000 },
-  { day: '28 Mar', Revenus: 22000, Dépenses: 12000, Épargne: 10000 },
-  { day: '29 Mar', Revenus: 19000, Dépenses: 10000, Épargne: 9000 },
-  { day: '30 Mar', Revenus: 25000, Dépenses: 13000, Épargne: 12000 },
+  { day: '24 Mar', Revenus: 15000, Dépenses: 5000, Balance: 10000 },
+  { day: '25 Mar', Revenus: 18000, Dépenses: 8000, Balance: 10000 },
+  { day: '26 Mar', Revenus: 16000, Dépenses: 7000, Balance: 9000 },
+  { day: '27 Mar', Revenus: 20000, Dépenses: 9000, Balance: 11000 },
+  { day: '28 Mar', Revenus: 22000, Dépenses: 12000, Balance: 10000 },
+  { day: '29 Mar', Revenus: 19000, Dépenses: 10000, Balance: 9000 },
+  { day: '30 Mar', Revenus: 25000, Dépenses: 13000, Balance: 12000 },
 ];
 
 const CustomTooltip = ({ active, payload, label, isDark }) => {
@@ -105,7 +105,7 @@ export const WeeklyAnalysisChart = ({ isDark }) => {
         />
         <Line
           type="monotone"
-          dataKey="Épargne"
+          dataKey="Balance"
           stroke="#8b5cf6"
           strokeWidth={2}
           dot={false}

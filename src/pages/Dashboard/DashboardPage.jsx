@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 // pages/Dashboard/DashboardPage.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { IncomeCard } from '../../components/cards/IncomeCard';
 import { OutcomeCard } from '../../components/cards/OutcomeCard';
@@ -8,6 +8,8 @@ import { SummaryCard } from '../../components/cards/SummaryCard';
 import { useOutletContext } from 'react-router-dom';
 import { WeeklyAnalysisChart } from '../../components/charts/WeeklyAnalysisChart';
 import { RecentTransactionsCard } from '../../components/cards/RecentTransactionsCard';
+import { accountsService } from '@/services/api/account';
+import { transactionService } from '@/services/api/transaction';
 
 // Animation de fade-in et slide-up
 const fadeInUp = {
@@ -18,7 +20,23 @@ const fadeInUp = {
 
 export const DashboardPage = () => {
   const { theme, isDark } = useOutletContext();
+  const [accountData, setAccountData] = useState(null);
+  const [recentTransactions, setRecentTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
   // Données temporaires - à remplacer par vos appels API
+  useEffect(() => {
+    accountsService.getAccountDetails(1)
+      .then(setAccountData)
+      .catch(() => setAccountData(null))
+      .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    transactionService.getAccountTransaction(1, { maxDate: 5 })
+      .then(setRecentTransactions)
+      .catch(() => setRecentTransactions([]));
+  }, []);
+
   const todayData = {
     income: 13910,
     incomePercentage: '+2.4%',
@@ -26,14 +44,15 @@ export const DashboardPage = () => {
     outcomePercentage: '-1.2%',
   };
 
-  const recentTransactions = [
-    { category: 'Salaire', date: '28 Juin, 10:42 AM', amount: 2500, isPositive: true },
-    { category: 'Courses', date: '27 Juin, 07:15 PM', amount: 85.50, isPositive: false },
-    { category: 'Remboursement', date: '27 Juin, 01:30 PM', amount: 120, isPositive: true },
-    { category: 'Restaurant', date: '26 Juin, 08:00 PM', amount: 54.20, isPositive: false },
-  ];
-
   const [showChart, setShowChart] = useState(false);
+
+  if (loading) {
+    return <div>Chargement...</div>;
+  }
+
+  if (!accountData) {
+    return <div>Erreur lors du chargement des données du compte.</div>;
+  }
 
   return (
     <div className="bg-black-100 p-0">
@@ -52,21 +71,21 @@ export const DashboardPage = () => {
         >
           <motion.div variants={fadeInUp}>
             <IncomeCard 
-              amount={todayData.income} 
+              amount={accountData.income} 
               percentage={todayData.incomePercentage}
               className={isDark ? 'bg-[#18181b] text-white border-gray-700' : 'bg-white text-gray-900 border-gray-100'}
             />
           </motion.div>
           <motion.div variants={fadeInUp}>
             <OutcomeCard 
-              amount={todayData.outcome} 
+              amount={accountData.expense} 
               percentage={todayData.outcomePercentage}
               className={isDark ? 'bg-[#18181b] text-white border-gray-700' : 'bg-white text-gray-900 border-gray-100'}
             />
           </motion.div>
           <motion.div variants={fadeInUp}>
             <SummaryCard 
-              amount={2000}
+              amount={accountData.balance}
               className={isDark ? 'bg-[#18181b] text-white border-gray-700' : 'bg-white text-gray-900 border-gray-100'}
             />
           </motion.div>
