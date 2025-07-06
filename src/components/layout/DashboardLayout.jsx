@@ -121,6 +121,7 @@ export const DashboardLayout = ({ initialTheme = 'light' }) => {
             flexGrow: 1,
             padding: { xs: 2, md: 3 },
             backgroundColor: backgroundColor,
+            maxHeight: 'calc(100vh - 68px)',
             overflow: 'auto',
             transition: 'background-color 0.3s ease'
           }}

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 // Centralisation des appels API avec logs
 
 const API_URL = import.meta.env.VITE_API_URL;

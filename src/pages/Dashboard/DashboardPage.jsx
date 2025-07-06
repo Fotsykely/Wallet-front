@@ -22,6 +22,7 @@ export const DashboardPage = () => {
   const { theme, isDark } = useOutletContext();
   const [accountData, setAccountData] = useState(null);
   const [recentTransactions, setRecentTransactions] = useState([]);
+  const [analysisData, setAnalysisData] = useState([]);
   const [loading, setLoading] = useState(true);
   // Données temporaires - à remplacer par vos appels API
   useEffect(() => {
@@ -35,6 +36,12 @@ export const DashboardPage = () => {
     transactionService.getAccountTransaction(1, { maxDate: 5 })
       .then(setRecentTransactions)
       .catch(() => setRecentTransactions([]));
+  }, []);
+
+  useEffect(() => {
+    accountsService.getAccountAnalysis(1, { maxDate: 7 })
+      .then(setAnalysisData)
+      .catch(() => setAnalysisData([]));
   }, []);
 
   const todayData = {
@@ -109,7 +116,7 @@ export const DashboardPage = () => {
                 <option>Cette semaine</option>
               </select>
             </div>
-            { showChart ? <WeeklyAnalysisChart isDark={isDark} /> : null}
+            { showChart ? <WeeklyAnalysisChart isDark={isDark} data={analysisData} /> : null}
             
           </motion.div>
 

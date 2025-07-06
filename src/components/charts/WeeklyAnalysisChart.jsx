@@ -35,16 +35,6 @@ AnimatedLine.propTypes = {
     strokeWidth: PropTypes.number
 };
 
-const data = [
-  { day: '24 Mar', Revenus: 15000, Dépenses: 5000, Balance: 10000 },
-  { day: '25 Mar', Revenus: 18000, Dépenses: 8000, Balance: 10000 },
-  { day: '26 Mar', Revenus: 16000, Dépenses: 7000, Balance: 9000 },
-  { day: '27 Mar', Revenus: 20000, Dépenses: 9000, Balance: 11000 },
-  { day: '28 Mar', Revenus: 22000, Dépenses: 12000, Balance: 10000 },
-  { day: '29 Mar', Revenus: 19000, Dépenses: 10000, Balance: 9000 },
-  { day: '30 Mar', Revenus: 25000, Dépenses: 13000, Balance: 12000 },
-];
-
 const CustomTooltip = ({ active, payload, label, isDark }) => {
   if (active && payload && payload.length) {
     return (
@@ -68,7 +58,7 @@ CustomTooltip.propTypes = {
   isDark: PropTypes.bool,
 };
 
-export const WeeklyAnalysisChart = ({ isDark }) => {
+export const WeeklyAnalysisChart = ({ isDark, data = [] }) => {
   return (
     <ResponsiveContainer width="100%" height={350}>
       <LineChart
