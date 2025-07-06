@@ -60,7 +60,7 @@ export const TransactionTable = ({
                 PEOPLE
                 </Typography>
             </div>
-            <div className="col-span-1 text-right">
+            <div className="col-span-1 text-left">
                 <Typography variant="body2" sx={{ color: mutedColor, fontWeight: 600 }}>
                 DATE
                 </Typography>

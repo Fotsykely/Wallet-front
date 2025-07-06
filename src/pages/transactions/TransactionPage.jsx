@@ -364,7 +364,7 @@ const TransactionPage = () => {
   const [actionAnchor, setActionAnchor] = useState(null);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   
-  const itemsPerPage = 8;
+  const itemsPerPage =6;
 
   // Styles dynamiques basés sur le thème
   const bgColor = isDark ? '#18181b' : '#ffffff';
@@ -412,6 +412,10 @@ const TransactionPage = () => {
   const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedTransactions = filteredTransactions.slice(startIndex, startIndex + itemsPerPage);
+
+  const handlePageChange = (event, newPage) => {
+    setCurrentPage(newPage);
+  };
 
   // Statistiques pour les filtres
   const stats = {
@@ -606,7 +610,7 @@ const TransactionPage = () => {
         transition={{ duration: 0.6, delay: 0.2 }}
       >
         <TransactionTable
-          transactions={filteredTransactions}
+          transactions={paginatedTransactions}
           getTypeIcon={getTypeIcon}
           getTypeColor={getTypeColor}
           getPaymentIcon={getPaymentIcon}
@@ -620,6 +624,36 @@ const TransactionPage = () => {
           onActionClick={handleActionClick}
         />
       </motion.div>
+
+      {/* ✅ Ajouter le composant de pagination */}
+      {totalPages > 1 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.4 }}
+          className="flex justify-center"
+        >
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            onChange={handlePageChange}
+            color="primary"
+            size="large"
+            sx={{
+              '& .MuiPaginationItem-root': {
+                color: textColor,
+                '&.Mui-selected': {
+                  backgroundColor: '#6366f1',
+                  color: 'white',
+                },
+                '&:hover': {
+                  backgroundColor: hoverColor,
+                }
+              }
+            }}
+          />
+        </motion.div>
+      )}
 
       {/* Menu d'actions */}
       <Menu
