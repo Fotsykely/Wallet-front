@@ -20,328 +20,56 @@ import {
 import { transactionService } from '@/services/api/transaction';
 import { TransactionTable } from '@/components/ui/TransactionTable';
 
-// Données de démonstration - à remplacer par vos appels API
-const mockTransactions = [
-  {
-    id: 1,
-    type: 'sent',
-    amount: -500.00,
-    currency: 'USD',
-    originalAmount: -500000,
-    originalCurrency: 'IDR',
-    paymentMethod: 'Credit Card',
-    paymentDetails: '**** 6969',
-    status: 'success',
-    activity: 'Sending money to Raihan Fikri',
-    recipient: 'Raihan Zuhlimin',
-    avatar: 'R',
-    avatarColor: '#ff9800',
-    date: 'Aug 28, 2023 3:40 PM',
-    icon: TrendingUp
-  },
-  {
-    id: 2,
-    type: 'sent',
-    amount: -200.00,
-    currency: 'USD',
-    originalAmount: -200000,
-    originalCurrency: 'IDR',
-    paymentMethod: 'Wire Transfer',
-    paymentDetails: '**** 8830',
-    status: 'success',
-    activity: 'Sending money to Bani Zuhlimin',
-    recipient: 'Bani Zuhlimin',
-    avatar: 'B',
-    avatarColor: '#4caf50',
-    date: 'Aug 28, 2023 3:40 PM',
-    icon: TrendingUp
-  },
-  {
-    id: 3,
-    type: 'received',
-    amount: +1500,
-    currency: 'USD',
-    paymentMethod: 'Bank Transfer',
-    paymentDetails: '**** 6683',
-    status: 'success',
-    activity: 'Received money from Andrew',
-    recipient: 'Andrew Top G',
-    avatar: 'AT',
-    avatarColor: '#2196f3',
-    date: 'Aug 28, 2023 3:40 PM',
-    icon: TrendingDown
-  },
-  {
-    id: 4,
-    type: 'received',
-    amount: +2500,
-    currency: 'USD',
-    paymentMethod: 'PayPal',
-    paymentDetails: '@clarista',
-    status: 'success',
-    activity: 'Payment for product',
-    recipient: 'Clarista Jawl',
-    avatar: 'C',
-    avatarColor: '#9c27b0',
-    date: 'Aug 28, 2023 3:40 PM',
-    icon: TrendingDown
-  },
-  {
-    id: 5,
-    type: 'received',
-    amount: +1500,
-    currency: 'USD',
-    paymentMethod: 'Payoneer',
-    paymentDetails: '**** 1083',
-    status: 'incomplete',
-    activity: 'Payment for invoice',
-    recipient: 'Andrew Top G',
-    avatar: 'AT',
-    avatarColor: '#2196f3',
-    date: 'Aug 27, 2023 5:30 PM',
-    icon: TrendingDown
-  },
-  {
-    id: 6,
-    type: 'converted',
-    amount: 400000,
-    currency: 'IDR',
-    originalAmount: 40,
-    originalCurrency: 'USD',
-    paymentMethod: 'Debit Card',
-    paymentDetails: '**** 3333',
-    status: 'failed',
-    activity: 'Convert money from USD to IDR',
-    recipient: 'Bagus Fikri',
-    avatar: 'BF',
-    avatarColor: '#795548',
-    date: 'Aug 27, 2023 3:35 PM',
-    icon: SwapHoriz
-  },
-  {
-    id: 7,
-    type: 'received',
-    amount: +500,
-    currency: 'USD',
-    paymentMethod: 'Credit Card',
-    paymentDetails: '**** 3288',
-    status: 'success',
-    activity: 'Received money from Bani Zuhlimin',
-    recipient: 'Bani Zuhlimin',
-    avatar: 'B',
-    avatarColor: '#4caf50',
-    date: 'Aug 27, 2023 2:15 PM',
-    icon: TrendingDown
-  },
-  {
-    id: 8,
-    type: 'received',
-    amount: +1000,
-    currency: 'IDR',
-    paymentMethod: 'PayPal',
-    paymentDetails: '@basilius.kevin',
-    status: 'success',
-    activity: 'Received money from Basilius Kelvin',
-    recipient: 'Basilius Kelvin',
-    avatar: 'BK',
-    avatarColor: '#e91e63',
-    date: 'Aug 27, 2023 11:10 AM',
-    icon: TrendingDown
-  },
-  {
-    id: 1,
-    type: 'sent',
-    amount: -500.00,
-    currency: 'USD',
-    originalAmount: -500000,
-    originalCurrency: 'IDR',
-    paymentMethod: 'Credit Card',
-    paymentDetails: '**** 6969',
-    status: 'success',
-    activity: 'Sending money to Raihan Fikri',
-    recipient: 'Raihan Zuhlimin',
-    avatar: 'R',
-    avatarColor: '#ff9800',
-    date: 'Aug 28, 2023 3:40 PM',
-    icon: TrendingUp
-  },
-  {
-    id: 2,
-    type: 'sent',
-    amount: -200.00,
-    currency: 'USD',
-    originalAmount: -200000,
-    originalCurrency: 'IDR',
-    paymentMethod: 'Wire Transfer',
-    paymentDetails: '**** 8830',
-    status: 'success',
-    activity: 'Sending money to Bani Zuhlimin',
-    recipient: 'Bani Zuhlimin',
-    avatar: 'B',
-    avatarColor: '#4caf50',
-    date: 'Aug 28, 2023 3:40 PM',
-    icon: TrendingUp
-  },
-  {
-    id: 3,
-    type: 'received',
-    amount: +1500,
-    currency: 'USD',
-    paymentMethod: 'Bank Transfer',
-    paymentDetails: '**** 6683',
-    status: 'success',
-    activity: 'Received money from Andrew',
-    recipient: 'Andrew Top G',
-    avatar: 'AT',
-    avatarColor: '#2196f3',
-    date: 'Aug 28, 2023 3:40 PM',
-    icon: TrendingDown
-  },
-  {
-    id: 4,
-    type: 'received',
-    amount: +2500,
-    currency: 'USD',
-    paymentMethod: 'PayPal',
-    paymentDetails: '@clarista',
-    status: 'success',
-    activity: 'Payment for product',
-    recipient: 'Clarista Jawl',
-    avatar: 'C',
-    avatarColor: '#9c27b0',
-    date: 'Aug 28, 2023 3:40 PM',
-    icon: TrendingDown
-  },
-  {
-    id: 5,
-    type: 'received',
-    amount: +1500,
-    currency: 'USD',
-    paymentMethod: 'Payoneer',
-    paymentDetails: '**** 1083',
-    status: 'incomplete',
-    activity: 'Payment for invoice',
-    recipient: 'Andrew Top G',
-    avatar: 'AT',
-    avatarColor: '#2196f3',
-    date: 'Aug 27, 2023 5:30 PM',
-    icon: TrendingDown
-  },
-  {
-    id: 6,
-    type: 'converted',
-    amount: 400000,
-    currency: 'IDR',
-    originalAmount: 40,
-    originalCurrency: 'USD',
-    paymentMethod: 'Debit Card',
-    paymentDetails: '**** 3333',
-    status: 'failed',
-    activity: 'Convert money from USD to IDR',
-    recipient: 'Bagus Fikri',
-    avatar: 'BF',
-    avatarColor: '#795548',
-    date: 'Aug 27, 2023 3:35 PM',
-    icon: SwapHoriz
-  },
-  {
-    id: 7,
-    type: 'received',
-    amount: +500,
-    currency: 'USD',
-    paymentMethod: 'Credit Card',
-    paymentDetails: '**** 3288',
-    status: 'success',
-    activity: 'Received money from Bani Zuhlimin',
-    recipient: 'Bani Zuhlimin',
-    avatar: 'B',
-    avatarColor: '#4caf50',
-    date: 'Aug 27, 2023 2:15 PM',
-    icon: TrendingDown
-  },
-  {
-    id: 8,
-    type: 'received',
-    amount: +1000,
-    currency: 'IDR',
-    paymentMethod: 'PayPal',
-    paymentDetails: '@basilius.kevin',
-    status: 'success',
-    activity: 'Received money from Basilius Kelvin',
-    recipient: 'Basilius Kelvin',
-    avatar: 'BK',
-    avatarColor: '#e91e63',
-    date: 'Aug 27, 2023 11:10 AM',
-    icon: TrendingDown
-  }
-];
-
-const getPaymentIcon = (method) => {
-  switch (method.toLowerCase()) {
-    case 'credit card':
-    case 'debit card':
-      return CreditCard;
-    case 'bank transfer':
-      return AccountBalance;
-    case 'wire transfer':
-      return AccountBalanceWallet;
-    case 'paypal':
-    case 'payoneer':
-      return Payment;
+// Fonctions utilitaires pour les données réelles
+const getCategoryIcon = (category) => {
+  switch (category.toLowerCase()) {
+    case 'income':
+      return TrendingDown; // Reçu
+    case 'expense':
+      return TrendingUp; // Dépensé
+    case 'loisir':
+      return TrendingUp;
     default:
-      return Payment;
+      return TrendingUp;
   }
 };
 
-const getStatusColor = (status) => {
-  switch (status) {
-    case 'success':
+const getCategoryColor = (category) => {
+  switch (category.toLowerCase()) {
+    case 'income':
+      return '#4caf50'; // Vert pour les revenus
+    case 'expense':
+      return '#f44336'; // Rouge pour les dépenses
+    case 'loisir':
+      return '#ff9800'; // Orange pour les loisirs
+    default:
+      return '#757575';
+  }
+};
+
+const getStatusColor = (category) => {
+  switch (category.toLowerCase()) {
+    case 'income':
       return '#4caf50';
-    case 'failed':
+    case 'expense':
       return '#f44336';
-    case 'incomplete':
+    case 'loisir':
       return '#ff9800';
     default:
       return '#757575';
   }
 };
 
-const getStatusText = (status) => {
-  switch (status) {
-    case 'success':
-      return 'Success';
-    case 'failed':
-      return 'Failed';
-    case 'incomplete':
-      return 'Incomplete';
+const getStatusText = (category) => {
+  switch (category.toLowerCase()) {
+    case 'income':
+      return 'Income';
+    case 'expense':
+      return 'Expense';
+    case 'loisir':
+      return 'Leisure';
     default:
-      return 'Unknown';
-  }
-};
-
-const getTypeIcon = (type) => {
-  switch (type) {
-    case 'sent':
-      return TrendingUp;
-    case 'received':
-      return TrendingDown;
-    case 'converted':
-      return SwapHoriz;
-    default:
-      return TrendingUp;
-  }
-};
-
-const getTypeColor = (type) => {
-  switch (type) {
-    case 'sent':
-      return '#f44336';
-    case 'received':
-      return '#4caf50';
-    case 'converted':
-      return '#2196f3';
-    default:
-      return '#757575';
+      return 'Other';
   }
 };
 
@@ -353,18 +81,19 @@ const fadeInUp = {
 
 const TransactionPage = () => {
   const { theme, isDark } = useOutletContext();
-  const [transactions, setTransactions] = useState(mockTransactions);
-  const [filteredTransactions, setFilteredTransactions] = useState(mockTransactions);
+  const [transactions, setTransactions] = useState([]);
+  const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [typeFilter, setTypeFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
   const [dateRange, setDateRange] = useState('7days');
   const [currentPage, setCurrentPage] = useState(1);
   const [filterAnchor, setFilterAnchor] = useState(null);
   const [actionAnchor, setActionAnchor] = useState(null);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   
-  const itemsPerPage =6;
+  const itemsPerPage = 7;
 
   // Styles dynamiques basés sur le thème
   const bgColor = isDark ? '#18181b' : '#ffffff';
@@ -374,12 +103,25 @@ const TransactionPage = () => {
   const hoverColor = isDark ? '#374151' : '#f9fafb';
   const searchBgColor = isDark ? '#374151' : '#f9fafb';
 
-  // Chargement des données (simulation)
+  // Chargement des données réelles
   useEffect(() => {
-    // Ici vous pourrez appeler votre API
-    // transactionService.getAllTransactions()
-    //   .then(setTransactions)
-    //   .catch(console.error);
+    const loadTransactions = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        // Utiliser l'ID du compte 1 par défaut - vous pouvez le rendre dynamique
+        const response = await transactionService.getAccountTransaction(1);
+        setTransactions(response);
+        setFilteredTransactions(response);
+      } catch (err) {
+        console.error('Erreur lors du chargement des transactions:', err);
+        setError('Erreur lors du chargement des transactions');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTransactions();
   }, []);
 
   // Filtrage des transactions
@@ -389,24 +131,18 @@ const TransactionPage = () => {
     // Filtre par recherche
     if (searchTerm) {
       filtered = filtered.filter(t => 
-        t.activity.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.recipient.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.paymentMethod.toLowerCase().includes(searchTerm.toLowerCase())
+        t.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        t.category.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    // Filtre par statut
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(t => t.status === statusFilter);
-    }
-
-    // Filtre par type
-    if (typeFilter !== 'all') {
-      filtered = filtered.filter(t => t.type === typeFilter);
+    // Filtre par catégorie
+    if (categoryFilter !== 'all') {
+      filtered = filtered.filter(t => t.category.toLowerCase() === categoryFilter);
     }
 
     setFilteredTransactions(filtered);
-  }, [transactions, searchTerm, statusFilter, typeFilter]);
+  }, [transactions, searchTerm, categoryFilter]);
 
   // Pagination
   const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
@@ -420,16 +156,16 @@ const TransactionPage = () => {
   // Statistiques pour les filtres
   const stats = {
     all: transactions.length,
-    received: transactions.filter(t => t.type === 'received').length,
-    sent: transactions.filter(t => t.type === 'sent').length,
-    converted: transactions.filter(t => t.type === 'converted').length,
+    income: transactions.filter(t => t.category.toLowerCase() === 'income').length,
+    expense: transactions.filter(t => t.category.toLowerCase() === 'expense').length,
+    loisir: transactions.filter(t => t.category.toLowerCase() === 'loisir').length,
   };
 
-  const formatAmount = (amount, currency) => {
-    const formatter = new Intl.NumberFormat('en-US', {
+  const formatAmount = (amount) => {
+    const formatter = new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: currency,
-      minimumFractionDigits: currency === 'IDR' ? 0 : 2,
+      currency: 'EUR',
+      minimumFractionDigits: 2,
     });
     return formatter.format(Math.abs(amount));
   };
@@ -449,6 +185,28 @@ const TransactionPage = () => {
     setSelectedTransaction(null);
   };
 
+  // Affichage du loading
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Typography variant="h6" sx={{ color: textColor }}>
+          Chargement des transactions...
+        </Typography>
+      </div>
+    );
+  }
+
+  // Affichage de l'erreur
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Typography variant="h6" sx={{ color: '#f44336' }}>
+          {error}
+        </Typography>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <motion.div 
@@ -457,57 +215,57 @@ const TransactionPage = () => {
         animate="animate"
         variants={fadeInUp}
       >
-        {/* Filtres par type de transaction */}
+        {/* Filtres par catégorie de transaction */}
         <div className="flex flex-wrap gap-2">
           <Chip
-            label={`All ${stats.all}`}
-            onClick={() => setTypeFilter('all')}
-            variant={typeFilter === 'all' ? 'filled' : 'outlined'}
+            label={`Toutes ${stats.all}`}
+            onClick={() => setCategoryFilter('all')}
+            variant={categoryFilter === 'all' ? 'filled' : 'outlined'}
             sx={{
-              backgroundColor: typeFilter === 'all' ? '#6366f1' : 'transparent',
-              color: typeFilter === 'all' ? 'white' : textColor,
-              borderColor: typeFilter === 'all' ? '#6366f1' : borderColor,
+              backgroundColor: categoryFilter === 'all' ? '#6366f1' : 'transparent',
+              color: categoryFilter === 'all' ? 'white' : textColor,
+              borderColor: categoryFilter === 'all' ? '#6366f1' : borderColor,
               '&:hover': {
-                backgroundColor: typeFilter === 'all' ? '#5855eb' : hoverColor,
+                backgroundColor: categoryFilter === 'all' ? '#5855eb' : hoverColor,
               }
             }}
           />
           <Chip
-            label={`Received ${stats.received}`}
-            onClick={() => setTypeFilter('received')}
-            variant={typeFilter === 'received' ? 'filled' : 'outlined'}
+            label={`Revenus ${stats.income}`}
+            onClick={() => setCategoryFilter('income')}
+            variant={categoryFilter === 'income' ? 'filled' : 'outlined'}
             sx={{
-              backgroundColor: typeFilter === 'received' ? '#4caf50' : 'transparent',
-              color: typeFilter === 'received' ? 'white' : textColor,
-              borderColor: typeFilter === 'received' ? '#4caf50' : borderColor,
+              backgroundColor: categoryFilter === 'income' ? '#4caf50' : 'transparent',
+              color: categoryFilter === 'income' ? 'white' : textColor,
+              borderColor: categoryFilter === 'income' ? '#4caf50' : borderColor,
               '&:hover': {
-                backgroundColor: typeFilter === 'received' ? '#43a047' : hoverColor,
+                backgroundColor: categoryFilter === 'income' ? '#43a047' : hoverColor,
               }
             }}
           />
           <Chip
-            label={`Sent ${stats.sent}`}
-            onClick={() => setTypeFilter('sent')}
-            variant={typeFilter === 'sent' ? 'filled' : 'outlined'}
+            label={`Dépenses ${stats.expense}`}
+            onClick={() => setCategoryFilter('expense')}
+            variant={categoryFilter === 'expense' ? 'filled' : 'outlined'}
             sx={{
-              backgroundColor: typeFilter === 'sent' ? '#f44336' : 'transparent',
-              color: typeFilter === 'sent' ? 'white' : textColor,
-              borderColor: typeFilter === 'sent' ? '#f44336' : borderColor,
+              backgroundColor: categoryFilter === 'expense' ? '#f44336' : 'transparent',
+              color: categoryFilter === 'expense' ? 'white' : textColor,
+              borderColor: categoryFilter === 'expense' ? '#f44336' : borderColor,
               '&:hover': {
-                backgroundColor: typeFilter === 'sent' ? '#e53935' : hoverColor,
+                backgroundColor: categoryFilter === 'expense' ? '#e53935' : hoverColor,
               }
             }}
           />
           <Chip
-            label={`Convert ${stats.converted}`}
-            onClick={() => setTypeFilter('converted')}
-            variant={typeFilter === 'converted' ? 'filled' : 'outlined'}
+            label={`Loisirs ${stats.loisir}`}
+            onClick={() => setCategoryFilter('loisir')}
+            variant={categoryFilter === 'loisir' ? 'filled' : 'outlined'}
             sx={{
-              backgroundColor: typeFilter === 'converted' ? '#2196f3' : 'transparent',
-              color: typeFilter === 'converted' ? 'white' : textColor,
-              borderColor: typeFilter === 'converted' ? '#2196f3' : borderColor,
+              backgroundColor: categoryFilter === 'loisir' ? '#ff9800' : 'transparent',
+              color: categoryFilter === 'loisir' ? 'white' : textColor,
+              borderColor: categoryFilter === 'loisir' ? '#ff9800' : borderColor,
               '&:hover': {
-                backgroundColor: typeFilter === 'converted' ? '#1e88e5' : hoverColor,
+                backgroundColor: categoryFilter === 'loisir' ? '#f57c00' : hoverColor,
               }
             }}
           />
@@ -516,7 +274,7 @@ const TransactionPage = () => {
         {/* Barre de recherche et contrôles */}
         <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
           <TextField
-            placeholder="Search transactions..."
+            placeholder="Rechercher des transactions..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             size="small"
@@ -545,11 +303,11 @@ const TransactionPage = () => {
           
           <div className="flex gap-2">
             <FormControl size="small" sx={{ minWidth: 120 }}>
-              <InputLabel sx={{ color: mutedColor }}>Period</InputLabel>
+              <InputLabel sx={{ color: mutedColor }}>Période</InputLabel>
               <Select
                 value={dateRange}
                 onChange={(e) => setDateRange(e.target.value)}
-                label="Period"
+                label="Période"
                 sx={{
                   backgroundColor: bgColor,
                   color: textColor,
@@ -558,30 +316,9 @@ const TransactionPage = () => {
                   }
                 }}
               >
-                <MenuItem value="7days">Last 7 days</MenuItem>
-                <MenuItem value="30days">Last 30 days</MenuItem>
-                <MenuItem value="90days">Last 90 days</MenuItem>
-              </Select>
-            </FormControl>
-
-            <FormControl size="small" sx={{ minWidth: 120 }}>
-              <InputLabel sx={{ color: mutedColor }}>Status</InputLabel>
-              <Select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                label="Status"
-                sx={{
-                  backgroundColor: bgColor,
-                  color: textColor,
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: borderColor
-                  }
-                }}
-              >
-                <MenuItem value="all">All</MenuItem>
-                <MenuItem value="success">Success</MenuItem>
-                <MenuItem value="failed">Failed</MenuItem>
-                <MenuItem value="incomplete">Incomplete</MenuItem>
+                <MenuItem value="7days">7 derniers jours</MenuItem>
+                <MenuItem value="30days">30 derniers jours</MenuItem>
+                <MenuItem value="90days">90 derniers jours</MenuItem>
               </Select>
             </FormControl>
 
@@ -597,7 +334,7 @@ const TransactionPage = () => {
                 }
               }}
             >
-              Export
+              Exporter
             </Button>
           </div>
         </div>
@@ -611,9 +348,8 @@ const TransactionPage = () => {
       >
         <TransactionTable
           transactions={paginatedTransactions}
-          getTypeIcon={getTypeIcon}
-          getTypeColor={getTypeColor}
-          getPaymentIcon={getPaymentIcon}
+          getCategoryIcon={getCategoryIcon}
+          getCategoryColor={getCategoryColor}
           getStatusText={getStatusText}
           getStatusColor={getStatusColor}
           formatAmount={formatAmount}
@@ -625,7 +361,7 @@ const TransactionPage = () => {
         />
       </motion.div>
 
-      {/* ✅ Ajouter le composant de pagination */}
+      {/* Pagination */}
       {totalPages > 1 && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -682,9 +418,9 @@ const TransactionPage = () => {
           }
         }}
       >
-        <MenuItem onClick={handleCloseMenus}>View Details</MenuItem>
-        <MenuItem onClick={handleCloseMenus}>Download Receipt</MenuItem>
-        <MenuItem onClick={handleCloseMenus}>Report Issue</MenuItem>
+        <MenuItem onClick={handleCloseMenus}>Voir les détails</MenuItem>
+        <MenuItem onClick={handleCloseMenus}>Télécharger le reçu</MenuItem>
+        <MenuItem onClick={handleCloseMenus}>Signaler un problème</MenuItem>
       </Menu>
     </div>
   );

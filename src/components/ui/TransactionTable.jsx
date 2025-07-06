@@ -6,9 +6,8 @@ import { motion } from 'framer-motion';
 
 export const TransactionTable = ({
   transactions,
-  getTypeIcon,
-  getTypeColor,
-  getPaymentIcon,
+  getCategoryIcon,
+  getCategoryColor,
   getStatusText,
   getStatusColor,
   formatAmount,
@@ -37,30 +36,20 @@ export const TransactionTable = ({
             </div>
             <div className="col-span-2">
                 <Typography variant="body2" sx={{ color: mutedColor, fontWeight: 600 }}>
-                AMOUNT
+                MONTANT
                 </Typography>
             </div>
             <div className="col-span-2">
                 <Typography variant="body2" sx={{ color: mutedColor, fontWeight: 600 }}>
-                PAYMENT METHOD
+                CATÉGORIE
                 </Typography>
             </div>
-            <div className="col-span-1 text-center">
+            <div className="col-span-4">
                 <Typography variant="body2" sx={{ color: mutedColor, fontWeight: 600 }}>
-                STATUS
-                </Typography>
-            </div>
-            <div className="col-span-3">
-                <Typography variant="body2" sx={{ color: mutedColor, fontWeight: 600 }}>
-                ACTIVITY
+                DESCRIPTION
                 </Typography>
             </div>
             <div className="col-span-2">
-                <Typography variant="body2" sx={{ color: mutedColor, fontWeight: 600 }}>
-                PEOPLE
-                </Typography>
-            </div>
-            <div className="col-span-1 text-left">
                 <Typography variant="body2" sx={{ color: mutedColor, fontWeight: 600 }}>
                 DATE
                 </Typography>
@@ -70,8 +59,7 @@ export const TransactionTable = ({
     {/* Lignes de transactions */}
     <div>
       {transactions.map((transaction, index) => {
-        const TypeIcon = getTypeIcon(transaction.type);
-        const PaymentIcon = getPaymentIcon(transaction.paymentMethod);
+        const CategoryIcon = getCategoryIcon(transaction.category);
         return (
             <motion.div
                 key={transaction.id}
@@ -100,97 +88,55 @@ export const TransactionTable = ({
                         width: 32,
                         height: 32,
                         borderRadius: '50%',
-                        backgroundColor: getTypeColor(transaction.type),
+                        backgroundColor: getCategoryColor(transaction.category),
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center'
                         }}
                     >
-                        <TypeIcon sx={{ fontSize: 16, color: 'white' }} />
+                        <CategoryIcon sx={{ fontSize: 16, color: 'white' }} />
                     </Box>
                     </div>
 
                     {/* Montant */}
                     <div className="col-span-2">
-                    <div className="flex flex-col">
-                        <Typography 
+                    <Typography 
                         variant="body2" 
                         sx={{ 
                             fontWeight: 600,
-                            color: transaction.type === 'sent' ? '#f44336' : transaction.type === 'received' ? '#4caf50' : textColor
+                            color: transaction.amount > 0 ? '#4caf50' : '#f44336'
                         }}
                         >
-                        {transaction.type === 'sent' ? '-' : transaction.type === 'received' ? '+' : ''}{formatAmount(transaction.amount, transaction.currency)}
-                        </Typography>
-                        {transaction.originalAmount && (
-                        <Typography variant="caption" sx={{ color: mutedColor }}>
-                            {transaction.originalAmount.toLocaleString()} {transaction.originalCurrency}
-                        </Typography>
-                        )}
-                    </div>
-                    </div>
-
-                    {/* Méthode de paiement */}
-                    <div className="col-span-2">
-                    <div className="flex items-center gap-2">
-                        <PaymentIcon sx={{ fontSize: 16, color: mutedColor }} />
-                        <div>
-                        <Typography variant="body2" sx={{ color: textColor, fontWeight: 500 }}>
-                            {transaction.paymentMethod}
-                        </Typography>
-                        <Typography variant="caption" sx={{ color: mutedColor }}>
-                            {transaction.paymentDetails}
-                        </Typography>
-                        </div>
-                    </div>
-                    </div>
-
-                    {/* Statut */}
-                    <div className="col-span-1 flex justify-center">
-                    <Chip
-                        label={getStatusText(transaction.status)}
-                        size="small"
-                        sx={{
-                        backgroundColor: getStatusColor(transaction.status),
-                        color: 'white',
-                        fontSize: '0.75rem',
-                        height: 24,
-                        fontWeight: 500
-                        }}
-                    />
-                    </div>
-
-                    {/* Activité */}
-                    <div className="col-span-3">
-                    <Typography variant="body2" sx={{ color: textColor }}>
-                        {transaction.activity}
+                        {transaction.amount > 0 ? '+' : ''}{formatAmount(transaction.amount)}
                     </Typography>
                     </div>
 
-                    {/* Personne */}
+                    {/* Catégorie */}
                     <div className="col-span-2">
-                    <div className="flex items-center gap-2">
-                        <Avatar
-                        sx={{
-                            width: 32,
-                            height: 32,
-                            backgroundColor: transaction.avatarColor,
-                            fontSize: '0.875rem',
-                            fontWeight: 600
-                        }}
-                        >
-                        {transaction.avatar}
-                        </Avatar>
-                        <Typography variant="body2" sx={{ color: textColor }}>
-                        {transaction.recipient}
-                        </Typography>
+                        <Chip
+                            label={getStatusText(transaction.category)}
+                            size="small"
+                            sx={{
+                            backgroundColor: getStatusColor(transaction.category),
+                            color: 'white',
+                            fontSize: '0.75rem',
+                            height: 24,
+                            fontWeight: 500
+                            }}
+                        />
                     </div>
+
+                    {/* Description */}
+                    <div className="col-span-4">
+                    <Typography variant="body2" sx={{ color: textColor }}>
+                        {transaction.description}
+                    </Typography>
                     </div>
 
                     {/* Date et actions */}
-                    <div className="col-span-1 flex items-center justify-end gap-2">
+                    <div className="col-span-3 flex items-center justify-between">
                     <Typography variant="caption" sx={{ color: mutedColor }}>
-                        {new Date(transaction.date).toLocaleDateString()}
+                        {new Date(transaction.date).toLocaleDateString('fr-FR')}
                     </Typography>
                     <IconButton
                         size="small"
@@ -211,9 +157,8 @@ export const TransactionTable = ({
 
 TransactionTable.propTypes = {
   transactions: PropTypes.array.isRequired,
-  getTypeIcon: PropTypes.func.isRequired,
-  getTypeColor: PropTypes.func.isRequired,
-  getPaymentIcon: PropTypes.func.isRequired,
+  getCategoryIcon: PropTypes.func.isRequired,
+  getCategoryColor: PropTypes.func.isRequired,
   getStatusText: PropTypes.func.isRequired,
   getStatusColor: PropTypes.func.isRequired,
   formatAmount: PropTypes.func.isRequired,
