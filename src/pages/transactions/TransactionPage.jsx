@@ -19,6 +19,7 @@ import {
 } from '@mui/icons-material';
 import { transactionService } from '@/services/api/transaction';
 import { TransactionTable } from '@/components/ui/TransactionTable';
+import { exportToCsv } from '@/utils/exportCsv';
 
 // Fonctions utilitaires pour les données réelles
 const getCategoryIcon = (category) => {
@@ -336,6 +337,10 @@ const TransactionPage = () => {
                   backgroundColor: hoverColor
                 }
               }}
+              onClick={() => exportToCsv(
+                dateRange ? `transaction_${dateRange}j_of_${Date.now()}.csv` : `transaction_of_${Date.now()}.csv`,
+                filteredTransactions
+              )}
             >
               Exporter
             </Button>
