@@ -85,7 +85,7 @@ const TransactionPage = () => {
   const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
-  const [dateRange, setDateRange] = useState('7days');
+  const [dateRange, setDateRange] = useState('7');
   const [currentPage, setCurrentPage] = useState(1);
   const [filterAnchor, setFilterAnchor] = useState(null);
   const [actionAnchor, setActionAnchor] = useState(null);
@@ -110,7 +110,7 @@ const TransactionPage = () => {
         setLoading(true);
         setError(null);
         // Utiliser l'ID du compte 1 par défaut - vous pouvez le rendre dynamique
-        const response = await transactionService.getAccountTransaction(1);
+        const response = await transactionService.getAccountTransaction(1, {maxDate: dateRange});
         setTransactions(response);
         setFilteredTransactions(response);
       } catch (err) {
@@ -122,7 +122,7 @@ const TransactionPage = () => {
     };
 
     loadTransactions();
-  }, []);
+  }, [dateRange]);
 
   // Filtrage des transactions
   useEffect(() => {
@@ -218,7 +218,7 @@ const TransactionPage = () => {
         {/* Filtres par catégorie de transaction */}
         <div className="flex flex-wrap gap-2">
           <Chip
-            label={`Toutes ${stats.all}`}
+            label={`Toutes (${stats.all})`}
             onClick={() => setCategoryFilter('all')}
             variant={categoryFilter === 'all' ? 'filled' : 'outlined'}
             sx={{
@@ -231,7 +231,7 @@ const TransactionPage = () => {
             }}
           />
           <Chip
-            label={`Revenus ${stats.income}`}
+            label={`Revenus (${stats.income})`}
             onClick={() => setCategoryFilter('income')}
             variant={categoryFilter === 'income' ? 'filled' : 'outlined'}
             sx={{
@@ -244,7 +244,7 @@ const TransactionPage = () => {
             }}
           />
           <Chip
-            label={`Dépenses ${stats.expense}`}
+            label={`Dépenses (${stats.expense})`}
             onClick={() => setCategoryFilter('expense')}
             variant={categoryFilter === 'expense' ? 'filled' : 'outlined'}
             sx={{
@@ -257,7 +257,7 @@ const TransactionPage = () => {
             }}
           />
           <Chip
-            label={`Loisirs ${stats.loisir}`}
+            label={`Loisirs (${stats.loisir})`}
             onClick={() => setCategoryFilter('loisir')}
             variant={categoryFilter === 'loisir' ? 'filled' : 'outlined'}
             sx={{
@@ -316,9 +316,12 @@ const TransactionPage = () => {
                   }
                 }}
               >
-                <MenuItem value="7days">7 derniers jours</MenuItem>
-                <MenuItem value="30days">30 derniers jours</MenuItem>
-                <MenuItem value="90days">90 derniers jours</MenuItem>
+                <MenuItem value="7">7 derniers jours</MenuItem>
+                <MenuItem value="15">15 derniers jours</MenuItem>
+                <MenuItem value="30">30 derniers jours</MenuItem>
+                <MenuItem value="90">90 derniers jours</MenuItem>
+                <MenuItem value="">Tous</MenuItem>
+
               </Select>
             </FormControl>
 
