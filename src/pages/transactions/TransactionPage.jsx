@@ -20,6 +20,7 @@ import {
 import { transactionService } from '@/services/api/transaction';
 import { TransactionTable } from '@/components/ui/TransactionTable';
 import { exportToCsv } from '@/utils/exportCsv';
+import AddTransactionModal from '@/components/modals/addTransactionModal';
 
 // Fonctions utilitaires pour les données réelles
 const getCategoryIcon = (category) => {
@@ -93,6 +94,7 @@ const TransactionPage = () => {
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   
   const itemsPerPage = 7;
 
@@ -186,6 +188,12 @@ const TransactionPage = () => {
     setSelectedTransaction(null);
   };
 
+  const handleAddTransaction = async (data) => {
+    // TODO: call API to add transaction (adapter selon ton backend)
+    setIsAddModalOpen(false);
+    // Optionnel : recharger les transactions ici
+  };
+
   // Affichage du loading
   if (loading) {
     return (
@@ -210,6 +218,11 @@ const TransactionPage = () => {
 
   return (
     <div className="space-y-6">
+      <AddTransactionModal
+        open={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSubmit={handleAddTransaction}
+      />
       <motion.div 
         className="max-w-7xl mx-auto space-y-6 px-2 sm:px-4"
         initial="initial"
@@ -302,6 +315,17 @@ const TransactionPage = () => {
             }}
           />
           
+          {/* Bouton pour ouvrir la modale d'ajout */}
+          <div className="flex justify-end mb-4">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => setIsAddModalOpen(true)}
+              sx={{ boxShadow: 'none', textTransform: 'none' }}
+            >
+              Ajouter une transaction
+            </Button>
+          </div>
           <div className="flex gap-2">
             <FormControl size="small" sx={{ minWidth: 120 }}>
               <InputLabel sx={{ color: mutedColor }}>Période</InputLabel>
