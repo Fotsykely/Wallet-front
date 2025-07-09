@@ -1,5 +1,5 @@
 import { Box, Drawer, useMediaQuery } from '@mui/material';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
@@ -19,120 +19,52 @@ const getPageInfo = (pathname) => {
   return routes[pathname] || { title: 'Dashboard', subtitle: 'Welcome back!' };
 };
 
-export const DashboardLayout = ({ initialTheme = 'light' }) => {
+export const DashboardLayout = ({ themeMode = 'light', setThemeMode }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const isMobile = useMediaQuery('(max-width: 768px)');
   const location = useLocation();
 
-  const getInitialTheme = () => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('theme');
-      if (stored) return stored;
-      // Sinon, détecte le thème système
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      return prefersDark ? 'dark' : 'light';
-    }
-    return initialTheme;
-  };
-  const [theme, setTheme] = useState(getInitialTheme);
+  const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
 
-  // Sauvegarder le thème à chaque changement
-  useEffect(() => {
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-  
+  // Fonction pour le switch du Sidebar
+  const handleThemeToggle = () => {
+    setThemeMode(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
+  const isDark = themeMode === 'dark';
+  const backgroundColor = isDark ? '#0f0f0f' : '#fafbfc';
   const pageInfo = getPageInfo(location.pathname);
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
-
-  const handleThemeToggle = () => {
-    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
-  };
-
-  const isDark = theme === 'dark';
-  const backgroundColor = isDark ? '#0f0f0f' : '#fafbfc';
-
   return (
-    <Box sx={{ 
-      display: 'flex', 
-      minHeight: '100vh', 
-      backgroundColor: backgroundColor,
-      transition: 'background-color 0.3s ease'
-    }}>
-      {/* Sidebar pour desktop */}
+    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor, transition: 'background-color 0.3s ease' }}>
+      {/* Sidebar */}
       {!isMobile && (
-        <Box 
-          component="nav"
-          sx={{ 
-            width: 260, 
-            flexShrink: 0,
-            '& .MuiDrawer-paper': { 
-              width: 260, 
-              boxSizing: 'border-box',
-              position: 'relative',
-              height: '200vh',
-              border: 'none'
-            }
-          }}
-        >
-          <Sidebar variant={theme} onToggleTheme={handleThemeToggle} />
+        <Box component="nav" sx={{ width: 260, flexShrink: 0 }}>
+          <Sidebar variant={themeMode} onToggleTheme={handleThemeToggle} />
         </Box>
       )}
-
-      {/* Drawer pour mobile */}
+      {/* Drawer mobile */}
       <Drawer
         variant="temporary"
         open={mobileOpen}
         onClose={handleDrawerToggle}
         ModalProps={{ keepMounted: true }}
-        sx={{
-          display: { xs: 'block', md: 'none' },
-          '& .MuiDrawer-paper': { 
-            width: 260,
-            boxSizing: 'border-box' 
-          }
-        }}
+        sx={{ display: { xs: 'block', md: 'none' }, '& .MuiDrawer-paper': { width: 260 } }}
       >
-        <Sidebar variant={theme} onToggleTheme={handleThemeToggle} />
+        <Sidebar variant={themeMode} onToggleTheme={handleThemeToggle} />
       </Drawer>
-      
       {/* Contenu principal */}
-      <Box sx={{ 
-        flexGrow: 1, 
-        display: 'flex', 
-        flexDirection: 'column',
-        minHeight: '100vh',
-        overflow: 'hidden'
-      }}>
-        {/* Header */}
+      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh', overflow: 'hidden' }}>
         <Header 
           onMenuClick={handleDrawerToggle}
           title={pageInfo.title}
           subtitle={pageInfo.subtitle}
-          theme={theme}
+          theme={themeMode}
         />
-        
-        {/* Contenu de la page */}
-        <Box 
-          component="main" 
-          sx={{ 
-            flexGrow: 1,
-            padding: { xs: 2, md: 3 },
-            backgroundColor: backgroundColor,
-            maxHeight: 'calc(100vh - 68px)',
-            overflow: 'auto',
-            transition: 'background-color 0.3s ease'
-          }}
-        >
-          <Outlet context={{ theme, isDark }} />
+        <Box component="main" sx={{ flexGrow: 1, padding: { xs: 2, md: 3 }, backgroundColor, maxHeight: 'calc(100vh - 68px)', overflow: 'auto', transition: 'background-color 0.3s ease' }}>
+          <Outlet context={{ theme: themeMode, isDark }} />
         </Box>
       </Box>
     </Box>
   );
-};
-
-DashboardLayout.propTypes = {
-  initialTheme: PropTypes.oneOf(['light', 'dark']),
 };

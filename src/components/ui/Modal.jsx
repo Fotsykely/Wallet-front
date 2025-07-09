@@ -1,21 +1,47 @@
 import React from 'react';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton
+} from '@mui/material';
+import { Close } from '@mui/icons-material';
 
-export default function Modal({ open, onClose, children, title }) {
-  if (!open) return null;
-
+export default function Modal({ open, onClose, title, children, actions, maxWidth = "sm", fullWidth = true }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white rounded-lg shadow-lg p-6 min-w-[320px] relative">
-        {title && <h2 className="text-lg font-bold mb-4">{title}</h2>}
-        <button
-          className="absolute top-2 right-2 text-gray-500 hover:text-black"
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth={maxWidth}
+      fullWidth={fullWidth}
+      PaperProps={{
+        sx: {
+          borderRadius: 2,
+          padding: 1
+        }
+      }}
+    >
+      <DialogTitle sx={{ m: 0, p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        {title}
+        <IconButton
+          aria-label="close"
           onClick={onClose}
-          aria-label="Close"
+          sx={{
+            color: (theme) => theme.palette.grey[500],
+          }}
         >
-          &times;
-        </button>
+          <Close />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent>
         {children}
-      </div>
-    </div>
+      </DialogContent>
+      {actions && (
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          {actions}
+        </DialogActions>
+      )}
+    </Dialog>
   );
 }
