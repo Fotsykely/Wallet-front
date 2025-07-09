@@ -315,8 +315,9 @@ const TransactionPage = () => {
             }}
           />
           
-          {/* Bouton pour ouvrir la modale d'ajout */}
-          <div className="flex justify-end mb-4">
+          
+          <div className="flex gap-2">
+            {/* Bouton pour ouvrir la modale d'ajout */}
             <Button
               variant="contained"
               color="primary"
@@ -325,8 +326,7 @@ const TransactionPage = () => {
             >
               Ajouter une transaction
             </Button>
-          </div>
-          <div className="flex gap-2">
+            
             <FormControl size="small" sx={{ minWidth: 120 }}>
               <InputLabel sx={{ color: mutedColor }}>Période</InputLabel>
               <Select
