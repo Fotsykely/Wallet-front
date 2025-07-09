@@ -189,9 +189,28 @@ const TransactionPage = () => {
   };
 
   const handleAddTransaction = async (data) => {
-    // TODO: call API to add transaction (adapter selon ton backend)
-    setIsAddModalOpen(false);
-    // Optionnel : recharger les transactions ici
+    try {
+      setLoading(true);
+      setError(null);
+      // Ici, on suppose que l'ID du compte est 1 (à adapter si besoin)
+      await transactionService.createTransaction(
+        1, // account_id
+        data.date, // date (peut être vide)
+        data.category, // category
+        data.description, // description
+        data.amount // amount
+      );
+      setIsAddModalOpen(false);
+      // Recharge les transactions après ajout
+      const response = await transactionService.getAccountTransaction(1, {maxDate: dateRange});
+      setTransactions(response);
+      setFilteredTransactions(response);
+    } catch (err) {
+      setError("Erreur lors de l'ajout de la transaction");
+      console.error('Erreur lors de l\'ajout de la transaction:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Affichage du loading
