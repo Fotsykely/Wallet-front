@@ -39,7 +39,7 @@ export const transactionService = {
     return request(
       `/transactions/${id}`,
       {
-        method: 'PUT',
+        method: 'PATCH',
         data: {
           "date": date,
           "category": category,

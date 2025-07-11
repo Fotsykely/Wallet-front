@@ -213,7 +213,7 @@ const TransactionPage = () => {
   try {
     setLoading(true);
     setError(null);
-    await transactionService.updateTransaction(
+    await transactionService.UpdateTransaction(
       selectedTransaction.id,
       data.date,
       data.category,
