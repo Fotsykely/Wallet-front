@@ -36,10 +36,14 @@ export default function AddTransactionModal({ open, onClose, onSubmit, initialDa
     e.preventDefault();
     if (!description || !amount) return;
     onSubmit({ description, amount, category, date });
-    setDescription('');
-    setAmount('');
-    setCategory('expense');
-    setDate('');
+    
+    // Ne réinitialiser les champs que si ce n'est PAS une modification
+    if (!initialData) {
+      setDescription('');
+      setAmount('');
+      setCategory('expense');
+      setDate('');
+    }
   };
 
   return (

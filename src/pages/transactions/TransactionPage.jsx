@@ -97,6 +97,7 @@ const TransactionPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   
   const itemsPerPage = 7;
 
@@ -187,7 +188,6 @@ const TransactionPage = () => {
   const handleCloseMenus = () => {
     setFilterAnchor(null);
     setActionAnchor(null);
-    setSelectedTransaction(null);
   };
 
   const handleDeleteTransaction = () => {
@@ -204,9 +204,35 @@ const TransactionPage = () => {
       });
   };
 
-  const handleUpdateTransaction = (selectedTransaction) => {
-
+  const handleOpenUpdateTransactionModal = () => {
+    setIsUpdateModalOpen(true);
+    setActionAnchor();
   };
+
+  const handleUpdateTransaction = async (data) => {
+  try {
+    setLoading(true);
+    setError(null);
+    await transactionService.updateTransaction(
+      selectedTransaction.id,
+      data.date,
+      data.category,
+      data.description,
+      data.amount
+    );
+    setIsUpdateModalOpen(false);
+    setSelectedTransaction(null); 
+    // Recharge les transactions après modification
+    const response = await transactionService.getAccountTransaction(1, {maxDate: dateRange});
+    setTransactions(response);
+    setFilteredTransactions(response);
+  } catch (err) {
+    setError("Erreur lors de la modification de la transaction");
+    console.error('Erreur lors de la modification de la transaction:', err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleAddTransaction = async (data) => {
     try {
@@ -259,8 +285,21 @@ const TransactionPage = () => {
     <div className="space-y-6">
       <AddTransactionModal
         open={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
+        onClose={() => {
+          setIsAddModalOpen(false);
+          setSelectedTransaction(null);
+        }}
         onSubmit={handleAddTransaction}
+      />
+      <AddTransactionModal
+        open={isUpdateModalOpen}
+        onClose={() => {
+          setIsUpdateModalOpen(false);
+          setSelectedTransaction(null);
+        }}
+        onSubmit={handleUpdateTransaction}
+        initialData={selectedTransaction}
+        title="Modifier la transaction"
       />
       <motion.div 
         className="w-full space-y-6 px-2 sm:px-4"
@@ -523,7 +562,7 @@ const TransactionPage = () => {
         <MenuItem onClick={handleCloseMenus}>Télécharger le reçu</MenuItem>
         <MenuItem onClick={handleCloseMenus}>Signaler un problème</MenuItem>
         <MenuItem onClick={handleDeleteTransaction}>Supprimer</MenuItem>
-        <MenuItem onClick={handleUpdateTransaction}>Modifier</MenuItem>
+        <MenuItem onClick={handleOpenUpdateTransactionModal}>Modifier</MenuItem>
       </Menu>
     </div>
   );
