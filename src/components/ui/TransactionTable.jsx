@@ -3,6 +3,7 @@ import { Box, Typography, Paper, Chip, Avatar, IconButton } from '@mui/material'
 import MoreVert from '@mui/icons-material/MoreVert';
 import PropTypes from 'prop-types';
 import { motion } from 'framer-motion';
+import { money } from '@/resources/content';
 
 export const TransactionTable = ({
   transactions,
@@ -107,7 +108,7 @@ export const TransactionTable = ({
                             color: transaction.amount > 0 ? '#4caf50' : '#f44336'
                         }}
                         >
-                        {transaction.amount > 0 ? '+' : ''}{formatAmount(transaction.amount)}
+                        {transaction.amount > 0 ? '+' : '-'}{formatAmount(transaction.amount)}
                     </Typography>
                     </div>
 

@@ -1,5 +1,6 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import PropTypes from 'prop-types';
+import { money } from '@/resources/content';
 
 const AnimatedLine = props => {
     const { points, stroke, strokeWidth, animationBegin } = props;
@@ -42,7 +43,7 @@ const CustomTooltip = ({ active, payload, label, isDark }) => {
         <p className="font-bold label">{label}</p>
         {payload.map(pld => (
           <div key={pld.dataKey} style={{ color: pld.color }}>
-            {`${pld.dataKey}: ${pld.value.toLocaleString()} €`}
+            {`${pld.dataKey}: ${pld.value.toLocaleString()} ${money.abréviation}`}
           </div>
         ))}
       </div>
@@ -60,7 +61,7 @@ CustomTooltip.propTypes = {
 
 export const WeeklyAnalysisChart = ({ isDark, data = [] }) => {
   return (
-    <ResponsiveContainer width="100%" height={350}>
+    <ResponsiveContainer width="100%" height={400}>
       <LineChart
         data={data}
         margin={{

@@ -1,4 +1,5 @@
 import {request} from '@/utils/api/clientApi.js';
+import { Update } from '@mui/icons-material';
 
 export const transactionService = {
   getAccountTransaction: (id, filter = {}) => {
@@ -25,5 +26,27 @@ export const transactionService = {
         }
       }
     );
-  }
+  },
+
+  deleteTransaction: (id) => {
+    return request(`/transactions/${id}`, {
+      method: 'DELETE'
+    });
+  },
+
+  UpdateTransaction: (id, date, category, description, amount) => {
+    const signedAmount = category === 'income' ? Math.abs(Number(amount)) : -Math.abs(Number(amount));
+    return request(
+      `/transactions/${id}`,
+      {
+        method: 'PUT',
+        data: {
+          "date": date,
+          "category": category,
+          "description": description,
+          "amount": signedAmount
+        }
+      }
+    );
+  },
 };

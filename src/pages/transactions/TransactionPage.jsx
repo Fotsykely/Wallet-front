@@ -21,6 +21,8 @@ import { transactionService } from '@/services/api/transaction';
 import { TransactionTable } from '@/components/ui/TransactionTable';
 import { exportToCsv } from '@/utils/exportCsv';
 import AddTransactionModal from '@/components/modals/addTransactionModal';
+import { Money } from '@mui/icons-material';
+import { money } from '@/resources/content';
 
 // Fonctions utilitaires pour les données réelles
 const getCategoryIcon = (category) => {
@@ -167,7 +169,7 @@ const TransactionPage = () => {
   const formatAmount = (amount) => {
     const formatter = new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'EUR',
+      currency: money.abréviation,
       minimumFractionDigits: 2,
     });
     return formatter.format(Math.abs(amount));
@@ -186,6 +188,24 @@ const TransactionPage = () => {
     setFilterAnchor(null);
     setActionAnchor(null);
     setSelectedTransaction(null);
+  };
+
+  const handleDeleteTransaction = () => {
+    //TODO: Implémenter la logique de suppression de transaction
+    transactionService.deleteTransaction(selectedTransaction.id)
+      .then(() => {
+        setTransactions(transactions.filter(t => t.id !== selectedTransaction.id));
+        setFilteredTransactions(filteredTransactions.filter(t => t.id !== selectedTransaction.id));
+        handleCloseMenus();
+      })
+      .catch(err => {
+        console.error('Erreur lors de la suppression de la transaction:', err);
+        setError('Erreur lors de la suppression de la transaction');
+      });
+  };
+
+  const handleUpdateTransaction = (selectedTransaction) => {
+
   };
 
   const handleAddTransaction = async (data) => {
@@ -243,7 +263,7 @@ const TransactionPage = () => {
         onSubmit={handleAddTransaction}
       />
       <motion.div 
-        className="max-w-7xl mx-auto space-y-6 px-2 sm:px-4"
+        className="w-full space-y-6 px-2 sm:px-4"
         initial="initial"
         animate="animate"
         variants={fadeInUp}
@@ -289,7 +309,7 @@ const TransactionPage = () => {
               }
             }}
           />
-          <Chip
+          {/* <Chip
             label={`Loisirs (${stats.loisir})`}
             onClick={() => setCategoryFilter('loisir')}
             variant={categoryFilter === 'loisir' ? 'filled' : 'outlined'}
@@ -301,52 +321,52 @@ const TransactionPage = () => {
                 backgroundColor: categoryFilter === 'loisir' ? '#f57c00' : hoverColor,
               }
             }}
-          />
+          /> */}
         </div>
 
         {/* Barre de recherche et contrôles */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-          <TextField
-            placeholder="Rechercher des transactions..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            size="small"
-            sx={{ minWidth: 300 }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search sx={{ color: mutedColor, fontSize: '1.25rem' }} />
-                </InputAdornment>
-              ),
-              sx: {
-                backgroundColor: searchBgColor,
-                color: textColor,
-                '& .MuiOutlinedInput-notchedOutline': {
-                  border: 'none'
-                },
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  border: 'none'
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  border: '1px solid #6366f1'
+        <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center w-full">
+          <div className="w-full sm:w-auto flex flex-row gap-2 items-center">
+            <TextField
+              placeholder="Rechercher des transactions..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              size="small"
+              sx={{ minWidth: 200, flex: 1 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search sx={{ color: mutedColor, fontSize: '1.25rem' }} />
+                  </InputAdornment>
+                ),
+                sx: {
+                  backgroundColor: searchBgColor,
+                  color: textColor,
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    border: 'none'
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    border: 'none'
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    border: '1px solid #6366f1'
+                  }
                 }
-              }
-            }}
-          />
-          
-          
-          <div className="flex gap-2">
+              }}
+            />
+          </div>
+          <div className="flex gap-2 w-full sm:w-auto sm:flex-row flex-col">
             {/* Bouton pour ouvrir la modale d'ajout */}
             <Button
-              variant="contained"
+              variant="outlined"
               color="primary"
               onClick={() => setIsAddModalOpen(true)}
-              sx={{ boxShadow: 'none', textTransform: 'none' }}
+              sx={{ boxShadow: 'none', textTransform: 'none', width: { xs: '100%', sm: 'auto' }, mb: { xs: 1, sm: 0 } }}
             >
               Ajouter une transaction
             </Button>
             
-            <FormControl size="small" sx={{ minWidth: 120 }}>
+            <FormControl size="small" sx={{ minWidth: 120, width: { xs: '100%', sm: 'auto' }, mb: { xs: 1, sm: 0 } }}>
               <InputLabel sx={{ color: mutedColor }}>Période</InputLabel>
               <Select
                 value={dateRange}
@@ -357,7 +377,8 @@ const TransactionPage = () => {
                   color: textColor,
                   '& .MuiOutlinedInput-notchedOutline': {
                     borderColor: borderColor
-                  }
+                  },
+                  width: { xs: '100%', sm: 'auto' }
                 }}
               >
                 <MenuItem value="7">7 derniers jours</MenuItem>
@@ -378,7 +399,8 @@ const TransactionPage = () => {
                 '&:hover': {
                   borderColor: mutedColor,
                   backgroundColor: hoverColor
-                }
+                },
+                width: { xs: '100%', sm: 'auto' }
               }}
               onClick={() => exportToCsv(
                 dateRange ? `transaction_${dateRange}j_of_${Date.now()}.csv` : `transaction_of_${Date.now()}.csv`,
@@ -391,25 +413,53 @@ const TransactionPage = () => {
         </div>
       </motion.div>
 
-      {/* Table des transactions */}
+      {/* Table des transactions ou cartes responsive */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
       >
-        <TransactionTable
-          transactions={paginatedTransactions}
-          getCategoryIcon={getCategoryIcon}
-          getCategoryColor={getCategoryColor}
-          getStatusText={getStatusText}
-          getStatusColor={getStatusColor}
-          formatAmount={formatAmount}
-          textColor={textColor}
-          mutedColor={mutedColor}
-          borderColor={borderColor}
-          hoverColor={hoverColor}
-          onActionClick={handleActionClick}
-        />
+        {/* Affichage responsive : cartes sur mobile, tableau sur desktop */}
+        <div className="block sm:hidden space-y-3">
+          {paginatedTransactions.map((transaction, index) => {
+            const CategoryIcon = getCategoryIcon(transaction.category);
+            return (
+              <Paper key={transaction.id} sx={{ backgroundColor: bgColor, color: textColor, border: `1px solid ${borderColor}`, borderRadius: 2, p: 2 }}>
+                <div className="flex items-center gap-3 mb-2">
+                  <Box sx={{ width: 32, height: 32, borderRadius: '50%', backgroundColor: getCategoryColor(transaction.category), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <CategoryIcon sx={{ fontSize: 16, color: 'white' }} />
+                  </Box>
+                  <Typography variant="body2" sx={{ fontWeight: 600, color: transaction.amount > 0 ? '#4caf50' : '#f44336' }}>
+                    {transaction.amount > 0 ? '+' : '-'}{formatAmount(transaction.amount)}
+                  </Typography>
+                  <Chip label={getStatusText(transaction.category)} size="small" sx={{ backgroundColor: getStatusColor(transaction.category), color: 'white', fontSize: '0.75rem', height: 24, fontWeight: 500 }} />
+                </div>
+                <Typography variant="body2" sx={{ color: textColor, mb: 1 }}>{transaction.description}</Typography>
+                <div className="flex justify-between items-center">
+                  <Typography variant="caption" sx={{ color: mutedColor }}>{new Date(transaction.date).toLocaleDateString('fr-FR')}</Typography>
+                  <IconButton size="small" onClick={(e) => handleActionClick(e, transaction)} sx={{ color: mutedColor }}>
+                    <MoreVert fontSize="small" />
+                  </IconButton>
+                </div>
+              </Paper>
+            );
+          })}
+        </div>
+        <div className="hidden sm:block">
+          <TransactionTable
+            transactions={paginatedTransactions}
+            getCategoryIcon={getCategoryIcon}
+            getCategoryColor={getCategoryColor}
+            getStatusText={getStatusText}
+            getStatusColor={getStatusColor}
+            formatAmount={formatAmount}
+            textColor={textColor}
+            mutedColor={mutedColor}
+            borderColor={borderColor}
+            hoverColor={hoverColor}
+            onActionClick={handleActionClick}
+          />
+        </div>
       </motion.div>
 
       {/* Pagination */}
@@ -472,6 +522,8 @@ const TransactionPage = () => {
         <MenuItem onClick={handleCloseMenus}>Voir les détails</MenuItem>
         <MenuItem onClick={handleCloseMenus}>Télécharger le reçu</MenuItem>
         <MenuItem onClick={handleCloseMenus}>Signaler un problème</MenuItem>
+        <MenuItem onClick={handleDeleteTransaction}>Supprimer</MenuItem>
+        <MenuItem onClick={handleUpdateTransaction}>Modifier</MenuItem>
       </Menu>
     </div>
   );

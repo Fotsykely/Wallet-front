@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from '../ui/Modal';
 import {
   TextField,
@@ -9,12 +9,28 @@ import {
   MenuItem,
   Box
 } from '@mui/material';
+import { money } from '@/resources/content';
 
-export default function AddTransactionModal({ open, onClose, onSubmit }) {
+export default function AddTransactionModal({ open, onClose, onSubmit, initialData, title = "Ajouter une transaction" }) {
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('expense');
   const [date, setDate] = useState('');
+
+  // Charger les données initiales si en mode modification
+  useEffect(() => {
+    if (initialData) {
+      setDescription(initialData.description || '');
+      setAmount(Math.abs(initialData.amount) || '');
+      setCategory(initialData.category || 'expense');
+      setDate(initialData.date ? new Date(initialData.date).toISOString().split('T')[0] : '');
+    } else {
+      setDescription('');
+      setAmount('');
+      setCategory('expense');
+      setDate('');
+    }
+  }, [initialData, open]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -30,7 +46,7 @@ export default function AddTransactionModal({ open, onClose, onSubmit }) {
     <Modal
       open={open}
       onClose={onClose}
-      title="Ajouter une transaction"
+      title={title}
       actions={[
         <Button key="cancel" onClick={onClose} color="inherit">
           Annuler
@@ -42,7 +58,7 @@ export default function AddTransactionModal({ open, onClose, onSubmit }) {
           color="primary"
           disabled={!description || !amount}
         >
-          Ajouter
+          {initialData ? 'Modifier' : 'Ajouter'}
         </Button>
       ]}
     >
@@ -64,7 +80,7 @@ export default function AddTransactionModal({ open, onClose, onSubmit }) {
           onChange={e => setAmount(e.target.value)}
           required
           InputProps={{
-            startAdornment: <span style={{ marginRight: 8 }}>€</span>,
+            startAdornment: <span style={{ marginRight: 8 }}>{money.abréviation}</span>,
           }}
         />
         <FormControl fullWidth>
@@ -76,7 +92,6 @@ export default function AddTransactionModal({ open, onClose, onSubmit }) {
           >
             <MenuItem value="expense">Dépense</MenuItem>
             <MenuItem value="income">Revenu</MenuItem>
-            <MenuItem value="loisir">Loisir</MenuItem>
           </Select>
         </FormControl>
         <TextField
