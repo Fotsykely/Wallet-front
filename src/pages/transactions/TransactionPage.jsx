@@ -89,7 +89,6 @@ const TransactionPage = () => {
   const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
-  const [dateRange, setDateRange] = useState('7');
   const [currentPage, setCurrentPage] = useState(1);
   const [filterAnchor, setFilterAnchor] = useState(null);
   const [actionAnchor, setActionAnchor] = useState(null);
@@ -98,6 +97,9 @@ const TransactionPage = () => {
   const [error, setError] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [dateRange, setDateRange] = useState(() => {
+    return localStorage.getItem('transactionDateRange') || '7';
+  });
   
   const itemsPerPage = 7;
 
@@ -115,6 +117,7 @@ const TransactionPage = () => {
       try {
         setLoading(true);
         setError(null);
+        localStorage.setItem('transactionDateRange', dateRange);
         // Utiliser l'ID du compte 1 par défaut - vous pouvez le rendre dynamique
         const response = await transactionService.getAccountTransaction(1, {maxDate: dateRange});
         setTransactions(response);
