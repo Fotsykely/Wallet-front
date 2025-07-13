@@ -561,8 +561,8 @@ const TransactionPage = () => {
           }
         }}
       >
-        <MenuItem onClick={handleDeleteTransaction}>Supprimer</MenuItem>
         <MenuItem onClick={handleOpenUpdateTransactionModal}>Modifier</MenuItem>
+        <MenuItem onClick={handleDeleteTransaction}>Supprimer</MenuItem>
       </Menu>
     </div>
   );
