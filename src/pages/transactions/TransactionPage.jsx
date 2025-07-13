@@ -558,9 +558,6 @@ const TransactionPage = () => {
           }
         }}
       >
-        <MenuItem onClick={handleCloseMenus}>Voir les détails</MenuItem>
-        <MenuItem onClick={handleCloseMenus}>Télécharger le reçu</MenuItem>
-        <MenuItem onClick={handleCloseMenus}>Signaler un problème</MenuItem>
         <MenuItem onClick={handleDeleteTransaction}>Supprimer</MenuItem>
         <MenuItem onClick={handleOpenUpdateTransactionModal}>Modifier</MenuItem>
       </Menu>
