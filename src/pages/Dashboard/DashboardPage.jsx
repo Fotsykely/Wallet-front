@@ -26,7 +26,7 @@ export const DashboardPage = () => {
   const [loading, setLoading] = useState(true);
   // Données temporaires - à remplacer par vos appels API
   useEffect(() => {
-    accountsService.getAccountDetails(1)
+    accountsService.getAccountDetails(1, true)
       .then(setAccountData)
       .catch(() => setAccountData(null))
       .finally(() => setLoading(false));
@@ -43,13 +43,6 @@ export const DashboardPage = () => {
       .then(setAnalysisData)
       .catch(() => setAnalysisData([]));
   }, []);
-
-  const todayData = {
-    income: 13910,
-    incomePercentage: '+2.4%',
-    outcome: 10067,
-    outcomePercentage: '-1.2%',
-  };
 
   const [showChart, setShowChart] = useState(false);
 
@@ -79,14 +72,14 @@ export const DashboardPage = () => {
           <motion.div variants={fadeInUp}>
             <IncomeCard 
               amount={accountData.income} 
-              percentage={todayData.incomePercentage}
+              percentage={accountData.incomePercentage}
               className={isDark ? 'bg-[#18181b] text-white border-gray-700' : 'bg-white text-gray-900 border-gray-100'}
             />
           </motion.div>
           <motion.div variants={fadeInUp}>
             <OutcomeCard 
               amount={accountData.expense} 
-              percentage={todayData.outcomePercentage}
+              percentage={accountData.expensePercentage}
               className={isDark ? 'bg-[#18181b] text-white border-gray-700' : 'bg-white text-gray-900 border-gray-100'}
             />
           </motion.div>
@@ -110,11 +103,11 @@ export const DashboardPage = () => {
           >
             <div className="flex justify-between items-center mb-6">
               <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Analyse de la semaine</h2>
-              <select
+              {/* <select
                 className={`px-4 py-2 rounded-lg ${isDark ? 'bg-[#232326] text-white' : 'bg-gray-100 text-gray-900'}`}
               >
                 <option>Cette semaine</option>
-              </select>
+              </select> */}
             </div>
             { showChart ? <WeeklyAnalysisChart isDark={isDark} data={analysisData} /> : null}
             

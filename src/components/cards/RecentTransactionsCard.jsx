@@ -47,7 +47,7 @@ export const RecentTransactionsCard = ({ transactions, className }) => {
           <MoreHorizIcon />
         </button> */}
       </div>
-      <div>
+      <div className='h-96 overflow-y-auto'>
         {transactions.map((t, index) => {
           const isPositive = t.amount > 0;
           return (
