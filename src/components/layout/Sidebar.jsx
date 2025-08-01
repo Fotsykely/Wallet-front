@@ -17,6 +17,7 @@ import {
   Dashboard,
   AccountBalanceWallet, 
   Receipt, 
+  Repeat,
   BarChart, 
   Settings,
   CreditCard,
@@ -89,7 +90,7 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
 const mainMenuItems = [
   { text: 'Dashboard', icon: Home, path: '/' },
   { text: 'Transactions', icon: Receipt, path: '/transactions' },
-  { text: 'Recurring', icon: TrendingUp, path: '/recurrings' },
+  { text: 'Recurrings', icon: Repeat, path: '/recurrings' },
   { text: 'Wallet', icon: AccountBalanceWallet, path: '/wallet' },
   { text: 'Analytics', icon: BarChart, path: '/analytics' },
 ];
