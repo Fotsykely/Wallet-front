@@ -2,123 +2,30 @@
 import { useState, useEffect } from 'react';
 import { Box, Typography, Button, Paper, IconButton, Menu, MenuItem, Pagination } from '@mui/material';
 import { useOutletContext } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import MoreVert from '@mui/icons-material/MoreVert';
 import { RecurringTable } from '@/components/table/recurringTable';
+import { PageHeader } from '@/components/common/PageHeader';
 import { recurringService } from '@/services/api/recurring';
 
-const mockRecurrings = [
-  {
-    id: 1,
-    account_id: 1,
-    type: 'expense',
-    description: 'Loyer',
-    amount: 50,
-    recurrence: 'monthly',
-    recurrence_date: 2,
-  },
-  {
-    id: 3,
-    account_id: 1,
-    type: 'expense',
-    description: 'Loyer',
-    amount: 500,
-    recurrence: 'monthly',
-    recurrence_date: 1,
-  },
-  {
-    id: 6,
-    account_id: 1,
-    type: 'expense',
-    description: 'café',
-    amount: 2000,
-    recurrence: 'daily',
-    recurrence_date: null,
-  },
-  {
-    id: 72,
-    account_id: 1,
-    type: 'expense',
-    description: 'Loyer',
-    amount: 50,
-    recurrence: 'monthly',
-    recurrence_date: 2,
-  },
-  {
-    id: 3211,
-    account_id: 1,
-    type: 'expense',
-    description: 'café',
-    amount: 2000,
-    recurrence: 'daily',
-    recurrence_date: null,
-  },
-  {
-    id: 190,
-    account_id: 1,
-    type: 'expense',
-    description: 'Loyer',
-    amount: 50,
-    recurrence: 'monthly',
-    recurrence_date: 2,
-  },
-  {
-    id: 213,
-    account_id: 1,
-    type: 'expense',
-    description: 'Loyer',
-    amount: 500,
-    recurrence: 'monthly',
-    recurrence_date: 1,
-  },
-  {
-    id: 61112,
-    account_id: 1,
-    type: 'expense',
-    description: 'café',
-    amount: 2000,
-    recurrence: 'daily',
-    recurrence_date: null,
-  },
-  {
-    id: 12121,
-    account_id: 1,
-    type: 'expense',
-    description: 'Loyer',
-    amount: 50,
-    recurrence: 'monthly',
-    recurrence_date: 2,
-  },
-  {
-    id: 2113,
-    account_id: 1,
-    type: 'expense',
-    description: 'Loyer',
-    amount: 500,
-    recurrence: 'monthly',
-    recurrence_date: 1,
-  },
-  {
-    id: 6212121,
-    account_id: 1,
-    type: 'expense',
-    description: 'café',
-    amount: 2000,
-    recurrence: 'daily',
-    recurrence_date: null,
-  },
-];
+const fadeInUp = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.5, ease: 'easeOut' }
+};
 
 export default function RecurringPage() {
   const { theme, isDark } = useOutletContext?.() || {};
   const [recurrings, setRecurrings] = useState([]);
+  const [filteredRecurrings, setFilteredRecurrings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionAnchor, setActionAnchor] = useState(null);
   const [selectedRecurring, setSelectedRecurring] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [typeFilter, setTypeFilter] = useState('all');
 
   const itemsPerPage = 7;
-  const totalPages = Math.ceil(recurrings.length / itemsPerPage);
-  const paginatedRecurrings = recurrings.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   // Styles dynamiques
   const bgColor = isDark ? '#18181b' : '#ffffff';
@@ -126,9 +33,64 @@ export default function RecurringPage() {
   const mutedColor = isDark ? '#9ca3af' : '#6b7280';
   const borderColor = isDark ? '#374151' : '#e5e7eb';
   const hoverColor = isDark ? '#374151' : '#f9fafb';
+  const searchBgColor = isDark ? '#374151' : '#f9fafb';
+
+  // Filtrage des récurrences
+  useEffect(() => {
+    let filtered = recurrings;
+
+    if (searchTerm) {
+      filtered = filtered.filter(r => 
+        r.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        r.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        r.recurrence.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (typeFilter !== 'all') {
+      filtered = filtered.filter(r => r.type.toLowerCase() === typeFilter);
+    }
+
+    setFilteredRecurrings(filtered);
+  }, [recurrings, searchTerm, typeFilter]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredRecurrings.length / itemsPerPage);
+  const paginatedRecurrings = filteredRecurrings.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  // Statistiques pour les filtres
+  const stats = {
+    all: recurrings.length,
+    income: recurrings.filter(r => r.type.toLowerCase() === 'income').length,
+    expense: recurrings.filter(r => r.type.toLowerCase() === 'expense').length,
+  };
+
+  // Configuration des filtres
+  const filterOptions = [
+    {
+      key: 'all',
+      label: `Toutes (${stats.all})`,
+      color: '#6366f1',
+      hoverColor: '#5855eb'
+    },
+    {
+      key: 'income',
+      label: `Revenus (${stats.income})`,
+      color: '#4caf50',
+      hoverColor: '#43a047'
+    },
+    {
+      key: 'expense',
+      label: `Dépenses (${stats.expense})`,
+      color: '#f44336',
+      hoverColor: '#e53935'
+    }
+  ];
 
   useEffect(() => {
-    recurringService.getRecurringByAccountId(1).then(setRecurrings).finally(() => setLoading(false));
+    recurringService.getRecurringByAccountId(1)
+      .then(setRecurrings)
+      .finally(() => setLoading(false));
   }, []);
 
   const handleActionClick = (event, recurring) => {
@@ -157,44 +119,101 @@ export default function RecurringPage() {
 
   return (
     <div className="space-y-6">
-      <Box sx={{ p: 3 }}>
-        <Button variant="contained" sx={{ mb: 2 }}>Add Recurring</Button>
-      </Box>
-      {/* Responsive : cartes sur mobile, tableau sur desktop */}
-      <div className="block sm:hidden space-y-3 px-3">
-        {paginatedRecurrings.map((rec) => (
-          <Paper key={rec.id} sx={{ backgroundColor: bgColor, color: textColor, border: `1px solid ${borderColor}`, borderRadius: 2, p: 2 }}>
-            <Typography variant="subtitle1">{rec.description}</Typography>
-            <Typography variant="body2">Type: {rec.type}</Typography>
-            <Typography variant="body2">Amount: {rec.amount}</Typography>
-            <Typography variant="body2">Recurrence: {rec.recurrence}</Typography>
-            {rec.recurrence_date !== null && (
-              <Typography variant="body2">
-                Recurrence date: {rec.recurrence_date}
-              </Typography>
-            )}
-            <Typography variant="body2">Account ID: {rec.account_id}</Typography>
-            <Box className="flex justify-end">
-              <IconButton size="small" onClick={e => handleActionClick(e, rec)} sx={{ color: mutedColor }}>
-                <MoreVert fontSize="small" />
-              </IconButton>
-            </Box>
-          </Paper>
-        ))}
-      </div>
-      <div className="hidden sm:block px-3">
-        <RecurringTable
-          rows={paginatedRecurrings}
+      <motion.div
+        initial="initial"
+        animate="animate"
+        variants={fadeInUp}
+      >
+        <PageHeader
+          filters={filterOptions}
+          activeFilter={typeFilter}
+          onFilterChange={setTypeFilter}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          searchPlaceholder="Rechercher des récurrences..."
           textColor={textColor}
-          mutedColor={mutedColor}
           borderColor={borderColor}
           hoverColor={hoverColor}
-          onActionClick={handleActionClick}
-        />
-      </div>
+          mutedColor={mutedColor}
+          searchBgColor={searchBgColor}
+        >
+          <Button
+            variant="outlined"
+            color="primary"
+            sx={{ 
+              boxShadow: 'none', 
+              textTransform: 'none', 
+              width: { xs: '100%', sm: 'auto' }, 
+              mb: { xs: 1, sm: 0 } 
+            }}
+          >
+            Ajouter une récurrence
+          </Button>
+        </PageHeader>
+      </motion.div>
+
+      {/* Table des récurrences ou cartes responsive */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+      >
+        {/* Responsive : cartes sur mobile, tableau sur desktop */}
+        <div className="block sm:hidden space-y-3 px-3">
+          {paginatedRecurrings.map((rec) => (
+            <Paper key={rec.id} sx={{ backgroundColor: bgColor, color: textColor, border: `1px solid ${borderColor}`, borderRadius: 2, p: 2 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+                {rec.description}
+              </Typography>
+              <div className="space-y-1">
+                <Typography variant="body2" sx={{ color: mutedColor }}>
+                  Type: <span style={{ color: textColor }}>{rec.type}</span>
+                </Typography>
+                <Typography variant="body2" sx={{ color: mutedColor }}>
+                  Montant: <span style={{ color: textColor }}>{rec.amount} MGA</span>
+                </Typography>
+                <Typography variant="body2" sx={{ color: mutedColor }}>
+                  Récurrence: <span style={{ color: textColor }}>{rec.recurrence}</span>
+                </Typography>
+                {rec.recurrence_date !== null && (
+                  <Typography variant="body2" sx={{ color: mutedColor }}>
+                    Date de récurrence: <span style={{ color: textColor }}>{rec.recurrence_date}</span>
+                  </Typography>
+                )}
+                <Typography variant="body2" sx={{ color: mutedColor }}>
+                  Compte ID: <span style={{ color: textColor }}>{rec.account_id}</span>
+                </Typography>
+              </div>
+              <Box className="flex justify-end mt-2">
+                <IconButton size="small" onClick={e => handleActionClick(e, rec)} sx={{ color: mutedColor }}>
+                  <MoreVert fontSize="small" />
+                </IconButton>
+              </Box>
+            </Paper>
+          ))}
+        </div>
+        
+        {/* Tableau pour desktop */}
+        <div className="hidden sm:block px-3">
+          <RecurringTable
+            rows={paginatedRecurrings}
+            textColor={textColor}
+            mutedColor={mutedColor}
+            borderColor={borderColor}
+            hoverColor={hoverColor}
+            onActionClick={handleActionClick}
+          />
+        </div>
+      </motion.div>
+
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.4 }}
+          className="flex justify-center"
+        >
           <Pagination
             count={totalPages}
             page={currentPage}
@@ -214,8 +233,9 @@ export default function RecurringPage() {
               }
             }}
           />
-        </div>
+        </motion.div>
       )}
+
       {/* Menu d'actions */}
       <Menu
         anchorEl={actionAnchor}
@@ -243,8 +263,8 @@ export default function RecurringPage() {
           }
         }}
       >
-        <MenuItem /* onClick={} */>Modifier</MenuItem>
-        <MenuItem /* onClick={} */>Supprimer</MenuItem>
+        <MenuItem onClick={handleCloseMenus}>Modifier</MenuItem>
+        <MenuItem onClick={handleCloseMenus}>Supprimer</MenuItem>
       </Menu>
     </div>
   );
