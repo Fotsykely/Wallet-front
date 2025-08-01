@@ -4,6 +4,7 @@ import { Box, Typography, Button, Paper, IconButton, Menu, MenuItem, Pagination 
 import { useOutletContext } from 'react-router-dom';
 import MoreVert from '@mui/icons-material/MoreVert';
 import { RecurringTable } from '@/components/table/recurringTable';
+import { recurringService } from '@/services/api/recurring';
 
 const mockRecurrings = [
   {
@@ -127,12 +128,7 @@ export default function RecurringPage() {
   const hoverColor = isDark ? '#374151' : '#f9fafb';
 
   useEffect(() => {
-    setTimeout(() => {
-      setRecurrings(mockRecurrings);
-      setLoading(false);
-    }, 500);
-    // Pour l'API plus tard :
-    // recurringService.getAll().then(setRecurrings).finally(() => setLoading(false));
+    recurringService.getRecurringByAccountId(1).then(setRecurrings).finally(() => setLoading(false));
   }, []);
 
   const handleActionClick = (event, recurring) => {
