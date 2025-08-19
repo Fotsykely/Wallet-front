@@ -7,8 +7,10 @@ export const recurringService = {
     return request(url);
   },
 
-  getRecurringByAccountId: (accountId) => {
-    return request(`/recurrings/account/${accountId}`);
+  getRecurringByAccountId: (accountId, filter = {}) => {
+    return request(`/recurrings/account/${accountId}`, {
+      params: filter
+    });
   },
 
   createRecurring: (accountId, type, description, amount, recurrence, recurrenceDate) => {
