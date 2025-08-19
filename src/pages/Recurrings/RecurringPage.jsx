@@ -1,12 +1,14 @@
 /* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react';
-import { Box, Typography, Button, Paper, IconButton, Menu, MenuItem, Pagination } from '@mui/material';
+import { Box, Typography, Button, Paper, IconButton, Menu, MenuItem, Pagination, FormControl, InputLabel, Select } from '@mui/material';
 import { useOutletContext } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { GetApp } from '@mui/icons-material';
 import MoreVert from '@mui/icons-material/MoreVert';
 import { RecurringTable } from '@/components/table/recurringTable';
 import { PageHeader } from '@/components/common/PageHeader';
 import { recurringService } from '@/services/api/recurring';
+import { exportToCsv } from '@/utils/exportCsv';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -24,6 +26,9 @@ export default function RecurringPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
+  const [dateRange, setDateRange] = useState(() => {
+    return localStorage.getItem('recurringDateRange') || '7';
+  });
 
   const itemsPerPage = 7;
 
@@ -34,6 +39,25 @@ export default function RecurringPage() {
   const borderColor = isDark ? '#374151' : '#e5e7eb';
   const hoverColor = isDark ? '#374151' : '#f9fafb';
   const searchBgColor = isDark ? '#374151' : '#f9fafb';
+
+  // Chargement des données avec filtrage par période
+  useEffect(() => {
+    const loadRecurrings = async () => {
+      try {
+        setLoading(true);
+        localStorage.setItem('recurringDateRange', dateRange);
+        // Ajouter le paramètre maxDate pour filtrer par période
+        const response = await recurringService.getRecurringByAccountId(1, { maxDate: dateRange });
+        setRecurrings(response);
+      } catch (err) {
+        console.error('Erreur lors du chargement des récurrences:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadRecurrings();
+  }, [dateRange]);
 
   // Filtrage des récurrences
   useEffect(() => {
@@ -86,12 +110,6 @@ export default function RecurringPage() {
       hoverColor: '#e53935'
     }
   ];
-
-  useEffect(() => {
-    recurringService.getRecurringByAccountId(1)
-      .then(setRecurrings)
-      .finally(() => setLoading(false));
-  }, []);
 
   const handleActionClick = (event, recurring) => {
     setSelectedRecurring(recurring);
@@ -149,6 +167,49 @@ export default function RecurringPage() {
           >
             Ajouter une récurrence
           </Button>
+
+          <FormControl size="small" sx={{ minWidth: 120, width: { xs: '100%', sm: 'auto' }, mb: { xs: 1, sm: 0 } }}>
+            <InputLabel sx={{ color: mutedColor }}>Période</InputLabel>
+            <Select
+              value={dateRange}
+              onChange={(e) => setDateRange(e.target.value)}
+              label="Période"
+              sx={{
+                backgroundColor: bgColor,
+                color: textColor,
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: borderColor
+                },
+                width: { xs: '100%', sm: 'auto' }
+              }}
+            >
+              <MenuItem value="7">7 derniers jours</MenuItem>
+              <MenuItem value="15">15 derniers jours</MenuItem>
+              <MenuItem value="30">30 derniers jours</MenuItem>
+              <MenuItem value="90">90 derniers jours</MenuItem>
+              <MenuItem value="">Tous</MenuItem>
+            </Select>
+          </FormControl>
+
+          <Button
+            variant="outlined"
+            startIcon={<GetApp />}
+            sx={{
+              borderColor: borderColor,
+              color: textColor,
+              '&:hover': {
+                borderColor: mutedColor,
+                backgroundColor: hoverColor
+              },
+              width: { xs: '100%', sm: 'auto' }
+            }}
+            onClick={() => exportToCsv(
+              dateRange ? `recurrences_${dateRange}j_of_${Date.now()}.csv` : `recurrences_of_${Date.now()}.csv`,
+              filteredRecurrings
+            )}
+          >
+            Exporter
+          </Button>
         </PageHeader>
       </motion.div>
 
@@ -181,7 +242,7 @@ export default function RecurringPage() {
                   </Typography>
                 )}
                 <Typography variant="body2" sx={{ color: mutedColor }}>
-                  Compte ID: <span style={{ color: textColor }}>{rec.account_id}</span>
+                  Créé le: <span style={{ color: textColor }}>{new Date(rec.created_at).toLocaleDateString('fr-FR')} à {new Date(rec.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
                 </Typography>
               </div>
               <Box className="flex justify-end mt-2">
