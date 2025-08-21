@@ -136,9 +136,9 @@ export default function RecurringPage() {
       setError(null);
       await recurringService.createRecurring(
         1, // account_id
+        data.type,
         data.description,
         data.amount,
-        data.type,
         data.recurrence,
         data.recurrenceDate || null
       );
