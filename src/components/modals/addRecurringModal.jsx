@@ -11,38 +11,42 @@ import {
 } from '@mui/material';
 import { money } from '@/resources/content';
 
-export default function AddTransactionModal({ open, onClose, onSubmit, initialData, title = "Ajouter une transaction" }) {
+export default function AddRecurringModal({ open, onClose, onSubmit, initialData, title = "Ajouter une récurrence" }) {
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
-  const [category, setCategory] = useState('expense');
-  const [date, setDate] = useState('');
+  const [type, setType] = useState('expense');
+  const [recurrence, setRecurrence] = useState('monthly');
+  const [recurrenceDate, setRecurrenceDate] = useState('');
 
   // Charger les données initiales si en mode modification
   useEffect(() => {
     if (initialData) {
       setDescription(initialData.description || '');
       setAmount(Math.abs(initialData.amount) || '');
-      setCategory(initialData.category || 'expense');
-      setDate(initialData.date ? new Date(initialData.date).toISOString().split('T')[0] : '');
+      setType(initialData.type || 'expense');
+      setRecurrence(initialData.recurrence || 'monthly');
+      setRecurrenceDate(initialData.recurrence_date ? new Date(initialData.recurrence_date).toISOString().split('T')[0] : '');
     } else {
       setDescription('');
       setAmount('');
-      setCategory('expense');
-      setDate('');
+      setType('expense');
+      setRecurrence('monthly');
+      setRecurrenceDate('');
     }
   }, [initialData, open]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!description || !amount) return;
-    onSubmit({ description, amount, category, date });
+    onSubmit({ description, amount, type, recurrence, recurrenceDate });
     
     // Ne réinitialiser les champs que si ce n'est PAS une modification
     if (!initialData) {
       setDescription('');
       setAmount('');
-      setCategory('expense');
-      setDate('');
+      setType('expense');
+      setRecurrence('monthly');
+      setRecurrenceDate('');
     }
   };
 
@@ -88,27 +92,40 @@ export default function AddTransactionModal({ open, onClose, onSubmit, initialDa
           }}
         />
         <FormControl fullWidth>
-          <InputLabel>Catégorie</InputLabel>
+          <InputLabel>Type</InputLabel>
           <Select
-            value={category}
-            onChange={e => setCategory(e.target.value)}
-            label="Catégorie"
+            value={type}
+            onChange={e => setType(e.target.value)}
+            label="Type"
           >
             <MenuItem value="expense">Dépense</MenuItem>
             <MenuItem value="income">Revenu</MenuItem>
           </Select>
         </FormControl>
+        <FormControl fullWidth>
+          <InputLabel>Récurrence</InputLabel>
+          <Select
+            value={recurrence}
+            onChange={e => setRecurrence(e.target.value)}
+            label="Récurrence"
+          >
+            <MenuItem value="daily">Quotidien</MenuItem>
+            <MenuItem value="weekly">Hebdomadaire</MenuItem>
+            <MenuItem value="monthly">Mensuel</MenuItem>
+            <MenuItem value="yearly">Annuel</MenuItem>
+          </Select>
+        </FormControl>
         <TextField
-          label="Date"
+          label="Date de récurrence"
           type="date"
           variant="outlined"
           fullWidth
-          value={date}
-          onChange={e => setDate(e.target.value)}
+          value={recurrenceDate}
+          onChange={e => setRecurrenceDate(e.target.value)}
           InputLabelProps={{
             shrink: true,
           }}
-          helperText="Optionnel - laissez vide pour aujourd'hui"
+          helperText="Optionnel - laissez vide pour commencer immédiatement"
         />
       </Box>
     </Modal>

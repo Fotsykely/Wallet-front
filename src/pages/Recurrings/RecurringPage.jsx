@@ -9,6 +9,7 @@ import { RecurringTable } from '@/components/table/recurringTable';
 import { PageHeader } from '@/components/common/PageHeader';
 import { recurringService } from '@/services/api/recurring';
 import { exportToCsv } from '@/utils/exportCsv';
+import AddRecurringModal from '@/components/modals/addRecurringModal';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -21,11 +22,14 @@ export default function RecurringPage() {
   const [recurrings, setRecurrings] = useState([]);
   const [filteredRecurrings, setFilteredRecurrings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [actionAnchor, setActionAnchor] = useState(null);
   const [selectedRecurring, setSelectedRecurring] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [dateRange, setDateRange] = useState(() => {
     return localStorage.getItem('recurringDateRange') || '7';
   });
@@ -45,12 +49,13 @@ export default function RecurringPage() {
     const loadRecurrings = async () => {
       try {
         setLoading(true);
+        setError(null);
         localStorage.setItem('recurringDateRange', dateRange);
-        // Ajouter le paramètre maxDate pour filtrer par période
         const response = await recurringService.getRecurringByAccountId(1, { maxDate: dateRange });
         setRecurrings(response);
       } catch (err) {
         console.error('Erreur lors du chargement des récurrences:', err);
+        setError('Erreur lors du chargement des récurrences');
       } finally {
         setLoading(false);
       }
@@ -125,6 +130,78 @@ export default function RecurringPage() {
     setCurrentPage(newPage);
   };
 
+  const handleAddRecurring = async (data) => {
+    try {
+      setLoading(true);
+      setError(null);
+      await recurringService.createRecurring(
+        1, // account_id
+        data.description,
+        data.amount,
+        data.type,
+        data.recurrence,
+        data.recurrenceDate || null
+      );
+      setIsAddModalOpen(false);
+      // Recharge les récurrences après ajout
+      const response = await recurringService.getRecurringByAccountId(1, { maxDate: dateRange });
+      setRecurrings(response);
+      setFilteredRecurrings(response);
+    } catch (err) {
+      setError("Erreur lors de l'ajout de la récurrence");
+      console.error('Erreur lors de l\'ajout de la récurrence:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOpenUpdateRecurringModal = () => {
+    setIsUpdateModalOpen(true);
+    setActionAnchor(null);
+  };
+
+  const handleUpdateRecurring = async (data) => {
+    try {
+      setLoading(true);
+      setError(null);
+      await recurringService.updateRecurring(
+        selectedRecurring.id,
+        data.description,
+        data.amount,
+        data.type,
+        data.recurrence,
+        data.recurrenceDate || null
+      );
+      setIsUpdateModalOpen(false);
+      setSelectedRecurring(null);
+      // Recharge les récurrences après modification
+      const response = await recurringService.getRecurringByAccountId(1, { maxDate: dateRange });
+      setRecurrings(response);
+      setFilteredRecurrings(response);
+    } catch (err) {
+      setError("Erreur lors de la modification de la récurrence");
+      console.error('Erreur lors de la modification de la récurrence:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteRecurring = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      await recurringService.deleteRecurring(selectedRecurring.id);
+      setRecurrings(recurrings.filter(r => r.id !== selectedRecurring.id));
+      setFilteredRecurrings(filteredRecurrings.filter(r => r.id !== selectedRecurring.id));
+      handleCloseMenus();
+    } catch (err) {
+      setError('Erreur lors de la suppression de la récurrence');
+      console.error('Erreur lors de la suppression de la récurrence:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -135,8 +212,38 @@ export default function RecurringPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Typography variant="h6" sx={{ color: '#f44336' }}>
+          {error}
+        </Typography>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
+      {/* recurring modal */}
+      <AddRecurringModal
+        open={isAddModalOpen}
+        onClose={() => {
+          setIsAddModalOpen(false);
+          setSelectedRecurring(null);
+        }}
+        onSubmit={handleAddRecurring}
+      />
+      <AddRecurringModal
+        open={isUpdateModalOpen}
+        onClose={() => {
+          setIsUpdateModalOpen(false);
+          setSelectedRecurring(null);
+        }}
+        onSubmit={handleUpdateRecurring}
+        initialData={selectedRecurring}
+        title="Modifier la récurrence"
+      />
+
       <motion.div
         initial="initial"
         animate="animate"
@@ -158,6 +265,7 @@ export default function RecurringPage() {
           <Button
             variant="outlined"
             color="primary"
+            onClick={() => setIsAddModalOpen(true)}
             sx={{ 
               boxShadow: 'none', 
               textTransform: 'none', 
@@ -324,8 +432,8 @@ export default function RecurringPage() {
           }
         }}
       >
-        <MenuItem onClick={handleCloseMenus}>Modifier</MenuItem>
-        <MenuItem onClick={handleCloseMenus}>Supprimer</MenuItem>
+        <MenuItem onClick={handleOpenUpdateRecurringModal}>Modifier</MenuItem>
+        <MenuItem onClick={handleDeleteRecurring}>Supprimer</MenuItem>
       </Menu>
     </div>
   );
