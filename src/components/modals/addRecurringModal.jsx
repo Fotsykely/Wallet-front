@@ -35,7 +35,7 @@ export default function AddRecurringModal({ open, onClose, onSubmit, initialData
     }
   }, [initialData, open]);
 
-  const handleSubmit = (e) => {
+  const  handleSubmit = (e) => {
     e.preventDefault();
     if (!description || !amount) return;
     onSubmit({ description, amount, type, recurrence, recurrenceDate });

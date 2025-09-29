@@ -164,7 +164,7 @@ export default function RecurringPage() {
     try {
       setLoading(true);
       setError(null);
-      await recurringService.updateRecurring(
+      await recurringService.updateRecurrings(
         selectedRecurring.id,
         data.description,
         data.amount,

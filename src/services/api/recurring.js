@@ -27,6 +27,19 @@ export const recurringService = {
     });
   },
 
+  updateRecurrings: (accountId, type, description, amount, recurrence, recurrenceDate) => {
+    return request(`/recurrings/${accountId}`, {
+      method: 'PUT',
+      data: {
+      type, 
+      description,
+      amount,
+      recurrence,
+      recurrence_date: recurrenceDate
+      }
+    });
+  },
+
   deleteRecurring: (id) => {
     return request(`/recurrings/${id}`, {
       method: 'DELETE'
