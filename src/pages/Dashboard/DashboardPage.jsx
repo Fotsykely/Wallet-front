@@ -74,71 +74,82 @@ export const DashboardPage = () => {
   return (
     <div className="bg-black-100 p-0">
       <motion.div 
-        className="max-w-7xl mx-auto space-y-8"
+        className="max-w-7xl mx-auto"
         initial="initial"
         animate="animate"
       >
-        {/* Stats Cards Row */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          variants={{
-            initial: {},
-            animate: { transition: { staggerChildren: 0.12 } }
-          }}
-        >
-          <motion.div variants={fadeInUp}>
-            <IncomeCard 
-              amount={accountData.income} 
-              percentage={accountData.incomePercentage}
-              className={isDark ? 'bg-[#18181b] text-white border-gray-700' : 'bg-white text-gray-900 border-gray-100'}
-            />
-          </motion.div>
-          <motion.div variants={fadeInUp}>
-            <OutcomeCard 
-              amount={accountData.expense} 
-              percentage={accountData.expensePercentage}
-              className={isDark ? 'bg-[#18181b] text-white border-gray-700' : 'bg-white text-gray-900 border-gray-100'}
-            />
-          </motion.div>
-          <motion.div variants={fadeInUp}>
-            <SummaryCard 
-              amount={accountData.balance}
-              budget={budgetAmount}
-              spent={expense}
-              remaining={remaining}
-              percentUsed={percentUsed}
-              className={isDark ? 'bg-[#18181b] text-white border-gray-700' : 'bg-white text-gray-900 border-gray-100'}
-            />
-          </motion.div>
-        </motion.div>
-
-        {/* Bottom Grid */}
+        {/* items-stretch est le défaut de grid, il assure que les colonnes ont la même hauteur */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Graph Section */}
-          <motion.div
-            className={`lg:col-span-2 ${isDark ? 'bg-[#18181b] text-white' : 'bg-white text-gray-900'} p-6 rounded-2xl shadow-lg`}
-            initial={{ opacity: 0, scale: 0.97 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, delay: 0.3, ease: 'easeOut' }}
-            onAnimationComplete={() => setShowChart(true)}
-          >
-            <div className="flex justify-between items-center mb-6">
-              <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Analyse de la semaine</h2>
-              {/* <select
-                className={`px-4 py-2 rounded-lg ${isDark ? 'bg-[#232326] text-white' : 'bg-gray-100 text-gray-900'}`}
-              >
-                <option>Cette semaine</option>
-              </select> */}
-            </div>
-            { showChart ? <WeeklyAnalysisChart isDark={isDark} data={analysisData} /> : null}
+          
+          {/* COLONNE GAUCHE : Ajout de flex flex-col */}
+          <div className="lg:col-span-2 flex flex-col gap-8">
             
-          </motion.div>
+            {/* Ligne 1 (Hauteur naturelle) */}
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-2 gap-8 shrink-0"
+              variants={{
+                initial: {},
+                animate: { transition: { staggerChildren: 0.12 } }
+              }}
+            >
+              <motion.div variants={fadeInUp}>
+                <IncomeCard 
+                  amount={accountData.income} 
+                  percentage={accountData.incomePercentage}
+                  className={isDark ? 'bg-[#18181b] text-white border-gray-700' : 'bg-white text-gray-900 border-gray-100'}
+                />
+              </motion.div>
+              <motion.div variants={fadeInUp}>
+                <OutcomeCard 
+                  amount={accountData.expense} 
+                  percentage={accountData.expensePercentage}
+                  className={isDark ? 'bg-[#18181b] text-white border-gray-700' : 'bg-white text-gray-900 border-gray-100'}
+                />
+              </motion.div>
+            </motion.div>
 
-          {/* Recent Transactions */}
-          <RecentTransactionsCard
-            transactions={recentTransactions}
-            className={isDark ? 'bg-[#18181b] text-white' : 'bg-white text-gray-900'}
-          />
+            {/* Ligne 2 : Graphique. Ajout de flex-1 pour qu'il prenne tout l'espace restant */}
+            <motion.div
+              className={`${isDark ? 'bg-[#18181b] text-white' : 'bg-white text-gray-900'} p-6 rounded-2xl shadow-lg flex-1 flex flex-col`}
+              initial={{ opacity: 0, scale: 0.97 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.7, delay: 0.3, ease: 'easeOut' }}
+              onAnimationComplete={() => setShowChart(true)}
+            >
+              <div className="flex justify-between items-center mb-6 shrink-0">
+                <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Analyse de la semaine</h2>
+              </div>
+              {/* Le graphique prendra 100% de l'espace disponible (flex-1) */}
+              <div className="flex-1 min-h-[300px]">
+                 { showChart ? <WeeklyAnalysisChart isDark={isDark} data={analysisData} height="100%" /> : null}
+              </div>
+            </motion.div>
+          </div>
+
+          {/* COLONNE DROITE : Ajout de flex flex-col */}
+          <div className="flex flex-col gap-8">
+            
+            {/* Balance (Hauteur naturelle) */}
+             <motion.div variants={fadeInUp} className="shrink-0">
+              <SummaryCard 
+                amount={accountData.balance}
+                budget={budgetAmount}
+                spent={expense}
+                remaining={remaining}
+                percentUsed={percentUsed}
+                className={isDark ? 'bg-[#18181b] text-white border-gray-700' : 'bg-white text-gray-900 border-gray-100'}
+              />
+            </motion.div>
+
+            {/* Transactions : Ajout de flex-1 pour qu'il prenne tout l'espace restant */}
+            <div className="flex-1 min-h-[400px]">
+              <RecentTransactionsCard
+                transactions={recentTransactions}
+                className={isDark ? 'bg-[#18181b] text-white' : 'bg-white text-gray-900'}
+              />
+            </div>
+          </div>
+
         </div>
       </motion.div>
     </div>

@@ -36,18 +36,16 @@ TransactionItem.propTypes = {
 export const RecentTransactionsCard = ({ transactions, className }) => {
   return (
     <motion.div 
-      className={`p-6 rounded-2xl shadow-lg ${className}`}
+      className={`p-6 rounded-2xl shadow-lg h-full flex flex-col ${className}`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-4 shrink-0">
         <h3 className="text-lg font-bold">Recent Transactions</h3>
-        {/* <button className="text-gray-400 hover:text-gray-600">
-          <MoreHorizIcon />
-        </button> */}
       </div>
-      <div className='h-96 overflow-y-auto pr-2'>
+      
+      <div className='flex-1 overflow-y-auto pr-2 min-h-0'>
         {transactions.map((t, index) => {
           const isPositive = t.amount > 0;
           return (

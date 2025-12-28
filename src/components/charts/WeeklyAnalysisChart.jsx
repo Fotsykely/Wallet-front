@@ -59,57 +59,61 @@ CustomTooltip.propTypes = {
   isDark: PropTypes.bool,
 };
 
-export const WeeklyAnalysisChart = ({ isDark, data = [] }) => {
+// On change la valeur par défaut à "100%"
+export const WeeklyAnalysisChart = ({ isDark, data = [], height = "100%" }) => {
   return (
-    <ResponsiveContainer width="100%" height={400}>
-      <LineChart
-        data={data}
-        margin={{
-          top: 5, right: 30, left: 20, bottom: 5,
-        }}
-      >
-        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)"} />
-        <XAxis dataKey="day" tick={{ fill: isDark ? '#A1A1A1' : '#333' }} axisLine={{ stroke: isDark ? '#444' : '#CCC' }} />
-        <YAxis tick={{ fill: isDark ? '#A1A1A1' : '#333' }} axisLine={{ stroke: isDark ? '#444' : '#CCC' }} tickFormatter={(value) => `${value / 1000}k`} />
-        <Tooltip content={<CustomTooltip isDark={isDark} />} cursor={{ stroke: 'rgba(128, 128, 128, 0.4)', strokeWidth: 1 }} />
-        <Legend />
-        <Line
-          type="monotone"
-          dataKey="Revenus"
-          stroke="#22c55e"
-          strokeWidth={2}
-          dot={false}
-          activeDot={{ r: 6 }}
-          isAnimationActive={true}
-          animationBegin={0}
-        />
-        <Line
-          type="monotone"
-          dataKey="Dépenses"
-          stroke="#3b82f6"
-          strokeWidth={2}
-          dot={false}
-          activeDot={{ r: 6 }}
-          isAnimationActive={true}
-          component={AnimatedLine}
-          animationBegin={0}
-        />
-        <Line
-          type="monotone"
-          dataKey="Balance"
-          stroke="#8b5cf6"
-          strokeWidth={2}
-          dot={false}
-          activeDot={{ r: 6 }}
-          isAnimationActive={true}
-          component={AnimatedLine}
-          animationBegin={0}
-        />
-      </LineChart>
-    </ResponsiveContainer>
+    // On ajoute min-height pour éviter que ça s'écrase si pas de données
+    <div style={{ width: '100%', height: height, minHeight: '300px' }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart
+          data={data}
+          margin={{
+            top: 5, right: 30, left: 20, bottom: 5,
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)"} />
+          <XAxis dataKey="day" tick={{ fill: isDark ? '#A1A1A1' : '#333' }} axisLine={{ stroke: isDark ? '#444' : '#CCC' }} />
+          <YAxis tick={{ fill: isDark ? '#A1A1A1' : '#333' }} axisLine={{ stroke: isDark ? '#444' : '#CCC' }} tickFormatter={(value) => `${value / 1000}k`} />
+          <Tooltip content={<CustomTooltip isDark={isDark} />} cursor={{ stroke: 'rgba(128, 128, 128, 0.4)', strokeWidth: 1 }} />
+          <Legend />
+          <Line
+            type="monotone"
+            dataKey="Revenus"
+            stroke="#22c55e"
+            strokeWidth={2}
+            dot={false}
+            activeDot={{ r: 6 }}
+            isAnimationActive={true}
+            animationBegin={0}
+          />
+          <Line
+            type="monotone"
+            dataKey="Dépenses"
+            stroke="#3b82f6"
+            strokeWidth={2}
+            dot={false}
+            activeDot={{ r: 6 }}
+            isAnimationActive={true}
+            component={AnimatedLine}
+            animationBegin={0}
+          />
+          <Line
+            type="monotone"
+            dataKey="Balance"
+            stroke="#8b5cf6"
+            strokeWidth={2}
+            dot={false}
+            activeDot={{ r: 6 }}
+            isAnimationActive={true}
+            component={AnimatedLine}
+            animationBegin={0}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   );
 };
 
 WeeklyAnalysisChart.propTypes = {
     isDark: PropTypes.bool,
-}; 
+};
