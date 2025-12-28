@@ -74,17 +74,12 @@ export const DashboardPage = () => {
   return (
     <div className="bg-black-100 p-0">
       <motion.div 
-        className="max-w-7xl mx-auto"
+        className="max-w-7xl mx-auto lg:h-[calc(100vh-140px)] min-h-[700px]"
         initial="initial"
         animate="animate"
       >
-        {/* items-stretch est le défaut de grid, il assure que les colonnes ont la même hauteur */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* COLONNE GAUCHE : Ajout de flex flex-col */}
-          <div className="lg:col-span-2 flex flex-col gap-8">
-            
-            {/* Ligne 1 (Hauteur naturelle) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-full">
+          <div className="lg:col-span-2 flex flex-col gap-8 h-full">       
             <motion.div 
               className="grid grid-cols-1 md:grid-cols-2 gap-8 shrink-0"
               variants={{
@@ -108,9 +103,9 @@ export const DashboardPage = () => {
               </motion.div>
             </motion.div>
 
-            {/* Ligne 2 : Graphique. Ajout de flex-1 pour qu'il prenne tout l'espace restant */}
+            {/* Ligne 2 : Graphique */}
             <motion.div
-              className={`${isDark ? 'bg-[#18181b] text-white' : 'bg-white text-gray-900'} p-6 rounded-2xl shadow-lg flex-1 flex flex-col`}
+              className={`${isDark ? 'bg-[#18181b] text-white' : 'bg-white text-gray-900'} p-6 rounded-2xl shadow-lg flex-1 flex flex-col min-h-0`}
               initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.7, delay: 0.3, ease: 'easeOut' }}
@@ -119,17 +114,16 @@ export const DashboardPage = () => {
               <div className="flex justify-between items-center mb-6 shrink-0">
                 <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Analyse de la semaine</h2>
               </div>
-              {/* Le graphique prendra 100% de l'espace disponible (flex-1) */}
-              <div className="flex-1 min-h-[300px]">
+              <div className="flex-1 min-h-[200px]">
                  { showChart ? <WeeklyAnalysisChart isDark={isDark} data={analysisData} height="100%" /> : null}
               </div>
             </motion.div>
           </div>
 
-          {/* COLONNE DROITE : Ajout de flex flex-col */}
-          <div className="flex flex-col gap-8">
+          {/* COLONNE DROITE */}
+          <div className="flex flex-col gap-8 h-full">
             
-            {/* Balance (Hauteur naturelle) */}
+            {/* Balance */}
              <motion.div variants={fadeInUp} className="shrink-0">
               <SummaryCard 
                 amount={accountData.balance}
@@ -141,8 +135,8 @@ export const DashboardPage = () => {
               />
             </motion.div>
 
-            {/* Transactions : Ajout de flex-1 pour qu'il prenne tout l'espace restant */}
-            <div className="flex-1 min-h-[400px]">
+            {/* Transactions */}
+            <div className="flex-1 min-h-0">
               <RecentTransactionsCard
                 transactions={recentTransactions}
                 className={isDark ? 'bg-[#18181b] text-white' : 'bg-white text-gray-900'}
