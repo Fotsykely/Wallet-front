@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown } from '@mui/icons-material';
+import { Children } from 'react';
 
 export const StatCard = ({ 
   title, 
@@ -10,6 +11,7 @@ export const StatCard = ({
   icon, 
   iconBgColor,
   className = '',
+  children,
   ...props 
 }) => {
   const isPositive = trend === 'up';
@@ -63,6 +65,8 @@ export const StatCard = ({
             </span>
           </div>
         </div>
+
+        {children}
       </div>
     </motion.div>
   );

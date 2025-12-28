@@ -10,6 +10,7 @@ import { WeeklyAnalysisChart } from '../../components/charts/WeeklyAnalysisChart
 import { RecentTransactionsCard } from '../../components/cards/RecentTransactionsCard';
 import { accountsService } from '@/services/api/account';
 import { transactionService } from '@/services/api/transaction';
+import { budgetService } from '@/services/api/budget';
 
 // Animation de fade-in et slide-up
 const fadeInUp = {
@@ -24,6 +25,8 @@ export const DashboardPage = () => {
   const [recentTransactions, setRecentTransactions] = useState([]);
   const [analysisData, setAnalysisData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [budgetData, setBudgetData] = useState(null);
+
   // Données temporaires - à remplacer par vos appels API
   useEffect(() => {
     accountsService.getAccountDetails(1, true)
@@ -44,7 +47,21 @@ export const DashboardPage = () => {
       .catch(() => setAnalysisData([]));
   }, []);
 
+  useEffect(() => {
+    // Get Budget for current month in YYYY-MM format
+    const now = new Date();
+    const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    budgetService.getBudget(1, month)
+      .then(setBudgetData)
+      .catch(() => setBudgetData(null));
+  }, []);
+
   const [showChart, setShowChart] = useState(false);
+
+  const budgetAmount = budgetData?.amount || 0;
+  const expense = Math.abs(accountData?.expense || 0);
+  const remaining = budgetAmount - expense;
+  const percentUsed = budgetAmount > 0 ? Math.min((expense / budgetAmount) * 100, 100) : 0;
 
   if (loading) {
     return <div>Chargement...</div>;
@@ -86,6 +103,10 @@ export const DashboardPage = () => {
           <motion.div variants={fadeInUp}>
             <SummaryCard 
               amount={accountData.balance}
+              budget={budgetAmount}
+              spent={expense}
+              remaining={remaining}
+              percentUsed={percentUsed}
               className={isDark ? 'bg-[#18181b] text-white border-gray-700' : 'bg-white text-gray-900 border-gray-100'}
             />
           </motion.div>
