@@ -12,7 +12,7 @@ const getPageInfo = (pathname) => {
     '/cards': { title: 'My Cards', subtitle: 'Manage your payment cards' },
     '/transactions': { title: 'Transactions', subtitle: 'View your transaction history' },
     '/recurrings': { title: 'Recurring Transactions', subtitle: 'Manage your recurring payments' },
-    '/wallet': { title: 'Wallet', subtitle: 'Manage your digital wallets' },
+    '/budgets': { title: 'Budgets', subtitle: 'Manage your digital wallets' },
     '/analytics': { title: 'Analytics', subtitle: 'Financial insights and reports' },
     '/settings': { title: 'Settings', subtitle: 'Configure your preferences' },
   };

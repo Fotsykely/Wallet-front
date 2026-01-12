@@ -91,7 +91,7 @@ const mainMenuItems = [
   { text: 'Dashboard', icon: Home, path: '/' },
   { text: 'Transactions', icon: Receipt, path: '/transactions' },
   { text: 'Recurrings', icon: Repeat, path: '/recurrings' },
-  { text: 'Wallet', icon: AccountBalanceWallet, path: '/wallet' },
+  { text: 'Budgets', icon: AccountBalanceWallet, path: '/budgets' },
   { text: 'Analytics', icon: BarChart, path: '/analytics' },
 ];
 

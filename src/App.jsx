@@ -5,6 +5,7 @@ import { DashboardLayout } from './components/layout/DashboardLayout';
 import { DashboardPage } from './pages/Dashboard/DashboardPage';
 import TransactionPage from '@/pages/transactions/TransactionPage';
 import RecurringPage from '@/pages/recurrings/RecurringPage';
+import BudgetPage from '@/pages/budgets/BudgetPage';
 
 function App() {
   const getInitialTheme = () => {
@@ -39,6 +40,7 @@ function App() {
         }>
           <Route index element={<DashboardPage />} /> 
           <Route path="Transactions" element={<TransactionPage />} />
+          <Route path="budgets" element={<BudgetPage />} />
           <Route path="recurrings" element={<RecurringPage />} />
         </Route>
       </Routes>
