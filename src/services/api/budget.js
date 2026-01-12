@@ -5,4 +5,6 @@ export const budgetService = {
     request('/budgets', { params: { account_id, month } }),
   setBudget: (data) =>
     request('/budgets', { method: 'POST', data }),
+  getBudgetSummary: (account_id, month) =>
+    request('/budgets/summary', { params: { account_id, month } }),
 };

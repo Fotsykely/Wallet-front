@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, TextField, Button, Paper, LinearProgress, Stack, Snackbar, Alert, CircularProgress, IconButton } from '@mui/material';
 import { budgetService } from '@/services/api/budget';
@@ -15,37 +16,71 @@ export default function BudgetPage() {
   const [error, setError] = useState(null);
   const [successMsg, setSuccessMsg] = useState('');
   const [accountData, setAccountData] = useState(null);
+  const [summary, setSummary] = useState({ budget: 0, spent: 0, remaining: 0, percent: 0 });
 
   const fmt = new Intl.NumberFormat('fr-FR');
 
   useEffect(() => {
     let mounted = true;
     setLoading(true);
-    Promise.all([
-      budgetService.getBudget(1, month).catch(() => null),
-      accountsService.getAccountDetails(1, true).catch(() => null),
-    ]).then(([b, acc]) => {
-      if (!mounted) return;
-      setAmount(b?.amount ?? '');
-      setAccountData(acc);
-    }).catch(() => {
-      if (!mounted) return;
-      setAmount('');
-      setAccountData(null);
-    }).finally(() => mounted && setLoading(false));
+    (async () => {
+      try {
+        const [summaryRes, acc] = await Promise.all([
+          budgetService.getBudgetSummary(1, month).catch(() => ({ budget: 0, spent: 0, remaining: 0, percent: 0 })),
+          accountsService.getAccountDetails(1, true).catch(() => null),
+        ]);
+        if (!mounted) return;
+        setAmount(summaryRes.budget || '');
+        setSummary(summaryRes);
+        setAccountData(acc);
+      } catch (e) {
+        if (!mounted) return;
+        setAmount('');
+        setAccountData(null);
+        setSummary({ budget: 0, spent: 0, remaining: 0, percent: 0 });
+      } finally {
+        mounted && setLoading(false);
+      }
+    })();
     return () => (mounted = false);
   }, [month]);
 
-  const expense = Math.abs(accountData?.expense || 0);
-  const budgetAmount = Number(amount) || 0;
-  const remaining = Math.max(budgetAmount - expense, 0);
-  const percentUsed = budgetAmount > 0 ? Math.min((expense / budgetAmount) * 100, 100) : 0;
+  // Use nullish coalescing to accept 0 from summary (don't fallback on falsy 0)
+  const expense = (summary && summary.spent !== undefined && summary.spent !== null)
+    ? Number(summary.spent)
+    : Math.abs(accountData?.expense || 0);
+
+  const budgetAmount = (summary && summary.budget !== undefined && summary.budget !== null)
+    ? Number(summary.budget)
+    : (Number(amount) || 0);
+
+  const remaining = (summary && summary.remaining !== undefined && summary.remaining !== null)
+    ? Number(summary.remaining)
+    : Math.max(budgetAmount - expense, 0);
+
+  const percentUsed = (summary && summary.percent !== undefined && summary.percent !== null)
+    ? Number(summary.percent)
+    : (budgetAmount > 0 ? Math.min((expense / budgetAmount) * 100, 100) : 0);
+
+  // détecter si le mois sélectionné est dans le futur (par rapport au mois courant)
+  const isFutureMonth = (() => {
+    const [y, m] = (month || '').split('-').map(Number);
+    if (!y || !m) return false;
+    const now = new Date();
+    const curY = now.getFullYear();
+    const curM = now.getMonth() + 1;
+    if (y > curY) return true;
+    if (y === curY && m > curM) return true;
+    return false;
+  })();
 
   const handleSave = async () => {
     setSaving(true);
     setError(null);
     try {
       await budgetService.setBudget({ account_id: 1, month, amount: Number(amount) });
+      const updated = await budgetService.getBudgetSummary(1, month).catch(() => ({ budget: 0, spent: 0, remaining: 0, percent: 0 }));
+      setSummary(updated);
       setSuccessMsg('Budget enregistré');
     } catch (err) {
       setError(err?.message || 'Erreur lors de la sauvegarde');
@@ -95,16 +130,26 @@ export default function BudgetPage() {
           ) : (
             <>
               <Typography variant="body2" color="text.secondary">Budget : {budgetAmount > 0 ? `${fmt.format(budgetAmount)} MGA` : '—'}</Typography>
-              <Typography variant="body2" color="text.secondary">Dépensé ce mois : {fmt.format(expense)} MGA</Typography>
-              <Typography variant="body2" color={remaining === 0 ? 'error.main' : 'text.secondary'}>Restant : {fmt.format(remaining)} MGA</Typography>
+              {isFutureMonth && expense === 0 ? (
+                <>
+                  <Typography variant="body2" color="text.secondary">Dépensé ce mois : —</Typography>
+                  <Typography variant="body2" color="text.secondary">Restant : {budgetAmount > 0 ? `${fmt.format(budgetAmount)} MGA` : '—'}</Typography>
+                  <Typography variant="caption" mt={0.5} color="text.secondary">Aucune dépense enregistrée pour ce mois (futur).</Typography>
+                </>
+              ) : (
+                <>
+                  <Typography variant="body2" color="text.secondary">Dépensé ce mois : {fmt.format(expense)} MGA</Typography>
+                  <Typography variant="body2" color={remaining === 0 ? 'error.main' : 'text.secondary'}>Restant : {fmt.format(remaining)} MGA</Typography>
 
-              <Box mt={2}>
-                <LinearProgress variant="determinate" value={percentUsed} sx={{ height: 10, borderRadius: 2 }} />
-                <Typography variant="caption" mt={0.5}>{Math.round(percentUsed)}% utilisé</Typography>
-              </Box>
+                  <Box mt={2}>
+                    <LinearProgress variant="determinate" value={percentUsed} sx={{ height: 10, borderRadius: 2 }} />
+                    <Typography variant="caption" mt={0.5}>{Math.round(percentUsed)}% utilisé</Typography>
+                  </Box>
+                </>
+              )}
+              {error && <Typography color="error" mt={2}>{error}</Typography>}
             </>
           )}
-          {error && <Typography color="error" mt={2}>{error}</Typography>}
         </Box>
       </Paper>
 

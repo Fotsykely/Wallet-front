@@ -2,6 +2,9 @@ import {request} from '@/utils/api/clientApi.js';
 import { Update } from '@mui/icons-material';
 
 export const transactionService = {
+  // Using: transactionService.getAccountTransaction(1, { month: '2026-03' })
+  // or: transactionService.getAccountTransaction(1, { year: '2026' })
+  // or: transactionService.getAccountTransaction(1, { date: '2026-03-15' })
   getAccountTransaction: (id, filter = {}) => {
     const params = new URLSearchParams(filter).toString();
     const url = params
