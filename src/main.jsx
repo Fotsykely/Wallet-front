@@ -5,6 +5,7 @@ import { HashRouter } from 'react-router-dom';
 import { theme } from './theme';
 import App from './App';
 import './index.css';
+import { NotificationProvider } from '@/components/ui/Notifier';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -12,7 +13,9 @@ root.render(
     <HashRouter>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <App />
+        <NotificationProvider>
+          <App />
+        </NotificationProvider>
       </ThemeProvider>
     </HashRouter>
   // </React.StrictMode>

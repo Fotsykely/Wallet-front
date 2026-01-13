@@ -2,10 +2,9 @@
 import React, { useState } from 'react';
 import { 
   Box, Typography, TextField, Button, Paper, 
-  LinearProgress, Stack, Snackbar, Alert, 
-  CircularProgress, IconButton 
+  LinearProgress, Stack, CircularProgress 
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
+import { useNotifier } from '@/components/ui/Notifier';
 import { useBudget } from '@/pages/Budgets/useBudget';
 
 export default function BudgetPage() {
@@ -19,19 +18,15 @@ export default function BudgetPage() {
     isFutureMonth
   } = useBudget(1, new Date().toISOString().slice(0, 7));
 
-  // Local state for success message
-  const [successMsg, setSuccessMsg] = useState('');
-
-  const fmt = new Intl.NumberFormat('fr-FR');
+  const { show } = useNotifier();
 
   // Wrapper to handle UI feedback after saving
   const onSave = async () => {
     try {
       await save();
-      setSuccessMsg('Budget enregistré avec succès');
+      show('Budget enregistré avec succès', 'success');
     } catch (e) {
-      // Error is already handled in the hook
-      // We can add a console log here if needed
+      show(e?.message || 'Erreur', 'error');
     }
   };
 
@@ -42,6 +37,8 @@ export default function BudgetPage() {
   const expenseVal = summary.spent || 0;
   const remainingVal = summary.remaining || 0;
   const percentVal = summary.percent || 0;
+
+  const fmt = new Intl.NumberFormat('fr-FR');
 
   return (
     <Box p={3}>
@@ -151,21 +148,6 @@ export default function BudgetPage() {
           Le budget se définit par mois. Utilisez les presets pour des réglages rapides.
         </Typography>
       </Paper>
-
-      <Snackbar
-        open={!!successMsg}
-        autoHideDuration={3000}
-        onClose={() => setSuccessMsg('')}
-        action={
-          <IconButton size="small" aria-label="close" color="inherit" onClick={() => setSuccessMsg('')}>
-            <CloseIcon fontSize="small" />
-          </IconButton>
-        }
-      >
-        <Alert onClose={() => setSuccessMsg('')} severity="success" sx={{ width: '100%' }}>
-          {successMsg}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 }
