@@ -92,7 +92,7 @@ const mainMenuItems = [
   { text: 'Transactions', icon: Receipt, path: '/transactions' },
   { text: 'Recurrings', icon: Repeat, path: '/recurrings' },
   { text: 'Budgets', icon: AccountBalanceWallet, path: '/budgets' },
-  { text: 'Analytics', icon: BarChart, path: '/analytics' },
+  // { text: 'Analytics', icon: BarChart, path: '/analytics' },
 ];
 
 const toolsMenuItems = [
