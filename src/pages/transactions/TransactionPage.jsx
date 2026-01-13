@@ -23,6 +23,7 @@ import { exportToCsv } from '@/utils/exportCsv';
 import AddTransactionModal from '@/components/modals/addTransactionModal';
 import { Money } from '@mui/icons-material';
 import { money } from '@/resources/content';
+import { useNotifier } from '@/components/ui/notifications/NotifierContext';
 
 // Fonctions utilitaires pour les données réelles
 const getCategoryIcon = (category) => {
@@ -85,6 +86,7 @@ const fadeInUp = {
 
 const TransactionPage = () => {
   const { theme, isDark } = useOutletContext();
+  const { show } = useNotifier();
   const [transactions, setTransactions] = useState([]);
   const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -200,10 +202,12 @@ const TransactionPage = () => {
         setTransactions(transactions.filter(t => t.id !== selectedTransaction.id));
         setFilteredTransactions(filteredTransactions.filter(t => t.id !== selectedTransaction.id));
         handleCloseMenus();
+        show('Transaction supprimée', 'success');
       })
       .catch(err => {
         console.error('Erreur lors de la suppression de la transaction:', err);
         setError('Erreur lors de la suppression de la transaction');
+        show(err?.message || 'Erreur lors de la suppression', 'error');
       });
   };
 
@@ -229,9 +233,11 @@ const TransactionPage = () => {
     const response = await transactionService.getAccountTransaction(1, {maxDate: dateRange});
     setTransactions(response);
     setFilteredTransactions(response);
+    show('Transaction modifiée avec succès', 'success');
   } catch (err) {
     setError("Erreur lors de la modification de la transaction");
     console.error('Erreur lors de la modification de la transaction:', err);
+    show(err?.message || "Erreur lors de la modification", 'error');
   } finally {
     setLoading(false);
   }
@@ -254,9 +260,11 @@ const TransactionPage = () => {
       const response = await transactionService.getAccountTransaction(1, {maxDate: dateRange});
       setTransactions(response);
       setFilteredTransactions(response);
+      show('Transaction ajoutée avec succès', 'success');
     } catch (err) {
       setError("Erreur lors de l'ajout de la transaction");
       console.error('Erreur lors de l\'ajout de la transaction:', err);
+      show(err?.message || "Erreur lors de l'ajout", 'error');
     } finally {
       setLoading(false);
     }

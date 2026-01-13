@@ -10,6 +10,7 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { recurringService } from '@/services/api/recurring';
 import { exportToCsv } from '@/utils/exportCsv';
 import AddRecurringModal from '@/components/modals/addRecurringModal';
+import { useNotifier } from '@/components/ui/notifications/NotifierContext';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -19,6 +20,7 @@ const fadeInUp = {
 
 export default function RecurringPage() {
   const { theme, isDark } = useOutletContext?.() || {};
+  const { show } = useNotifier();
   const [recurrings, setRecurrings] = useState([]);
   const [filteredRecurrings, setFilteredRecurrings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -147,9 +149,11 @@ export default function RecurringPage() {
       const response = await recurringService.getRecurringByAccountId(1, { maxDate: dateRange });
       setRecurrings(response);
       setFilteredRecurrings(response);
+      show('Récurrence ajoutée avec succès', 'success');
     } catch (err) {
       setError("Erreur lors de l'ajout de la récurrence");
-      console.error('Erreur lors de l\'ajout de la récurrence:', err);
+      console.error('Erreur lors du chargement des récurrences:', err);
+      show(err?.message || 'Erreur lors de l\'ajout', 'error');
     } finally {
       setLoading(false);
     }
@@ -178,9 +182,11 @@ export default function RecurringPage() {
       const response = await recurringService.getRecurringByAccountId(1, { maxDate: dateRange });
       setRecurrings(response);
       setFilteredRecurrings(response);
+      show('Récurrence modifiée avec succès', 'success');
     } catch (err) {
       setError("Erreur lors de la modification de la récurrence");
       console.error('Erreur lors de la modification de la récurrence:', err);
+      show(err?.message || 'Erreur lors de la modification', 'error');
     } finally {
       setLoading(false);
     }
@@ -194,9 +200,11 @@ export default function RecurringPage() {
       setRecurrings(recurrings.filter(r => r.id !== selectedRecurring.id));
       setFilteredRecurrings(filteredRecurrings.filter(r => r.id !== selectedRecurring.id));
       handleCloseMenus();
+      show('Récurrence supprimée', 'success');
     } catch (err) {
       setError('Erreur lors de la suppression de la récurrence');
       console.error('Erreur lors de la suppression de la récurrence:', err);
+      show(err?.message || 'Erreur lors de la suppression', 'error');
     } finally {
       setLoading(false);
     }
