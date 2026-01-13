@@ -6,6 +6,8 @@ import { DashboardPage } from './pages/Dashboard/DashboardPage';
 import TransactionPage from '@/pages/transactions/TransactionPage';
 import RecurringPage from '@/pages/recurrings/RecurringPage';
 import BudgetPage from '@/pages/budgets/BudgetPage';
+import SettingsPage from '@/pages/Settings/SettingsPage';
+import NotificationsPage from '@/pages/Notifications/NotificationsPage';
 
 function App() {
   const getInitialTheme = () => {
@@ -39,9 +41,11 @@ function App() {
           />
         }>
           <Route index element={<DashboardPage />} /> 
-          <Route path="Transactions" element={<TransactionPage />} />
+          <Route path="transactions" element={<TransactionPage />} />
           <Route path="budgets" element={<BudgetPage />} />
           <Route path="recurrings" element={<RecurringPage />} />
+          <Route path="settings" element={<SettingsPage />} />
+          <Route path="notifications" element={<NotificationsPage />} />
         </Route>
       </Routes>
     </ThemeProvider>

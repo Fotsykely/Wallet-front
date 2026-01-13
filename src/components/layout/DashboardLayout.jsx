@@ -13,8 +13,8 @@ const getPageInfo = (pathname) => {
     '/transactions': { title: 'Transactions', subtitle: 'View your transaction history' },
     '/recurrings': { title: 'Recurring Transactions', subtitle: 'Manage your recurring payments' },
     '/budgets': { title: 'Budgets', subtitle: 'Manage your digital wallets' },
-    // '/analytics': { title: 'Analytics', subtitle: 'Financial insights and reports' },
     '/settings': { title: 'Settings', subtitle: 'Configure your preferences' },
+    '/notifications': { title: 'Notifications', subtitle: 'System updates and alerts' },
   };
   
   return routes[pathname] || { title: 'Dashboard', subtitle: 'Welcome back!' };
