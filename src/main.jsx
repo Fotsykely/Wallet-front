@@ -5,7 +5,7 @@ import { HashRouter } from 'react-router-dom';
 import { theme } from './theme';
 import App from './App';
 import './index.css';
-import { NotificationProvider } from '@/components/ui/Notifier';
+import { NotificationProvider } from '@/components/ui/notifications/Notifier';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

@@ -1,8 +1,7 @@
-import React, { createContext, useContext, useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Snackbar, Alert, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-
-const NotifierContext = createContext(null);
+import { NotifierContext } from './NotifierContext'; // Importez le contexte ici
 
 export const NotificationProvider = ({ children }) => {
   const [state, setState] = useState({
@@ -40,10 +39,4 @@ export const NotificationProvider = ({ children }) => {
       </Snackbar>
     </NotifierContext.Provider>
   );
-};
-
-export const useNotifier = () => {
-  const ctx = useContext(NotifierContext);
-  if (!ctx) throw new Error('useNotifier must be used within NotificationProvider');
-  return ctx;
 };

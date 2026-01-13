@@ -4,7 +4,7 @@ import {
   Box, Typography, TextField, Button, Paper, 
   LinearProgress, Stack, CircularProgress 
 } from '@mui/material';
-import { useNotifier } from '@/components/ui/Notifier';
+import { useNotifier } from '@/components/ui/notifications/NotifierContext';
 import { useBudget } from '@/pages/Budgets/useBudget';
 
 export default function BudgetPage() {
