@@ -20,20 +20,39 @@ export default function SettingsPage() {
 
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [prefs, setPrefs] = useState({
-    budgetAlerts: true
-  });
+  
+  // État local pour le switch
+  const [alertsEnabled, setAlertsEnabled] = useState(false);
 
-  // Charger l'email depuis le backend au montage
+  // Charger les données (Email + Préférences)
   useEffect(() => {
-    // prefer account.email if present
+    // Load email from primary account (id = 1)
     accountsService.getAccount(1).then(acc => {
       if (acc && acc.email) setEmail(acc.email);
       else settingsService.getSettings().then(data => { if (data.user_email) setEmail(data.user_email); });
-    }).catch(() => {
-      settingsService.getSettings().then(data => { if (data.user_email) setEmail(data.user_email); });
+    }).catch(() => {});
+
+    // Load budget alert preference
+    settingsService.getSettings().then(data => {
+      // Convert string 'true' -> boolean
+      setAlertsEnabled(data.pref_budget_alerts === 'true');
     });
   }, []);
+
+  // Specific handlers for the budget alerts toggle
+  const handleToggleBudgetAlerts = async () => {
+    const newValue = !alertsEnabled;
+    setAlertsEnabled(newValue); // Optimistic UI update
+    
+    try {
+      // Sauvegarde en string 'true' ou 'false'
+      await settingsService.saveSetting('pref_budget_alerts', String(newValue));
+      show(newValue ? 'Alertes activées' : 'Alertes désactivées', 'info');
+    } catch (err) {
+      setAlertsEnabled(!newValue); // Rollback en cas d'erreur
+      show('Erreur lors de la sauvegarde de la préférence', 'error');
+    }
+  };
 
   const handleSaveProfile = async () => {
     try {
@@ -169,20 +188,21 @@ export default function SettingsPage() {
         </Stack>
       </Paper>
 
-      {/* Préférences (Mock pour l'instant sauf si implémenté en back) */}
+      {/* Préférences */}
       <SectionTitle>Préférences</SectionTitle>
       <Paper elevation={0} sx={cardStyle}>
         <List disablePadding>
           <ListItem>
             <ListItemText 
               primary="Alertes Budget" 
-              secondary="Simulation : Être notifié quand 80% du budget est atteint" 
+              secondary="Être notifié quand 80% du budget est atteint" 
             />
             <ListItemSecondaryAction>
               <Switch 
                 edge="end" 
-                checked={prefs.budgetAlerts}
-                onChange={() => setPrefs(p => ({...p, budgetAlerts: !p.budgetAlerts}))}
+                checked={alertsEnabled}
+                onChange={handleToggleBudgetAlerts}
+                disabled={loading}
               />
             </ListItemSecondaryAction>
           </ListItem>

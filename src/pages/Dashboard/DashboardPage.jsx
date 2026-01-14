@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 // pages/Dashboard/DashboardPage.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { IncomeCard } from '../../components/cards/IncomeCard';
 import { OutcomeCard } from '../../components/cards/OutcomeCard';
@@ -11,7 +11,7 @@ import { RecentTransactionsCard } from '../../components/cards/RecentTransaction
 import { accountsService } from '@/services/api/account';
 import { transactionService } from '@/services/api/transaction';
 import { budgetService } from '@/services/api/budget';
-
+import { useBudgetAlerts } from '@/hooks/useBudgetAlerts'; 
 // Animation de fade-in et slide-up
 const fadeInUp = {
   initial: { opacity: 0, y: 40 },
@@ -22,10 +22,17 @@ const fadeInUp = {
 export const DashboardPage = () => {
   const { theme, isDark } = useOutletContext();
   const [accountData, setAccountData] = useState(null);
-  const [recentTransactions, setRecentTransactions] = useState([]);
-  const [analysisData, setAnalysisData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [budgetData, setBudgetData] = useState(null);
+  const [analysisData, setAnalysisData] = useState([]);
+  
+  // 1. AJOUTER L'ÉTAT POUR LES TRANSACTIONS
+  const [recentTransactions, setRecentTransactions] = useState([]);
+
+  const currentMonth = useMemo(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  }, []);
 
   // Données temporaires - à remplacer par vos appels API
   useEffect(() => {
@@ -38,7 +45,10 @@ export const DashboardPage = () => {
   useEffect(() => {
     transactionService.getAccountTransaction(1, { maxDate: 5 })
       .then(setRecentTransactions)
-      .catch(() => setRecentTransactions([]));
+      .catch((err) => {
+        console.error(err);
+        setRecentTransactions([]);
+      });
   }, []);
 
   useEffect(() => {
@@ -60,6 +70,10 @@ export const DashboardPage = () => {
 
   const budgetAmount = budgetData?.amount || 0;
   const expense = Math.abs(accountData?.expense || 0);
+  
+  // Utilisation du Hook : Une seule ligne pour gérer toute la logique d'alerte
+  useBudgetAlerts(expense, budgetAmount, currentMonth);
+
   const remaining = budgetAmount - expense;
   const percentUsed = budgetAmount > 0 ? Math.min((expense / budgetAmount) * 100, 100) : 0;
 
@@ -137,6 +151,7 @@ export const DashboardPage = () => {
 
             {/* Transactions */}
             <div className="flex-1 min-h-0">
+              {/* 3. PASSER L'ÉTAT AU LIEU DU COMPOSANT */}
               <RecentTransactionsCard
                 transactions={recentTransactions}
                 className={isDark ? 'bg-[#18181b] text-white' : 'bg-white text-gray-900'}
