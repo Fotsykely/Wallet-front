@@ -1,27 +1,17 @@
 import { 
-  AppBar, 
-  Toolbar, 
-  IconButton, 
-  Typography, 
-  Box, 
-  Avatar, 
-  TextField, 
-  InputAdornment,
-  Badge,
-  Menu,
-  MenuItem,
-  Button
+  AppBar, Toolbar, IconButton, Typography, Box, Avatar, 
+  TextField, InputAdornment, Badge, Menu, MenuItem, 
+  Button, Divider, ListItemText, ListItemIcon
 } from '@mui/material';
 import { 
-  Menu as MenuIcon, 
-  Search, 
-  Notifications, 
-  KeyboardArrowDown,
-  GetApp,
-  CalendarToday
+  Menu as MenuIcon, Search, Notifications, 
+  KeyboardArrowDown, GetApp, CalendarToday,
+  DoneAll, Circle
 } from '@mui/icons-material';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
+import { useNotifier } from '@/components/ui/notifications/NotifierContext';
 
 export const Header = ({ 
   onMenuClick, 
@@ -29,20 +19,29 @@ export const Header = ({
   subtitle = "This is your wallet overview",
   theme = 'light'
 }) => {
+  const navigate = useNavigate();
+  
+  // Sécuriser la récupération du contexte avec des valeurs par défaut
+  const { 
+    unreadCount = 0, 
+    notifications = [], 
+    markAllAsRead = () => {} 
+  } = useNotifier() || {};
+
   const [anchorEl, setAnchorEl] = useState(null);
   const [notificationAnchor, setNotificationAnchor] = useState(null);
 
-  const handleProfileClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleNotificationClick = (event) => {
-    setNotificationAnchor(event.currentTarget);
-  };
-
+  const handleProfileClick = (event) => setAnchorEl(event.currentTarget);
+  const handleNotificationClick = (event) => setNotificationAnchor(event.currentTarget);
+  
   const handleClose = () => {
     setAnchorEl(null);
     setNotificationAnchor(null);
+  };
+
+  const handleViewAllNotifications = () => {
+    handleClose();
+    navigate('/notifications');
   };
 
   const isDark = theme === 'dark';
@@ -50,13 +49,15 @@ export const Header = ({
   const borderColor = isDark ? '#374151' : '#e5e7eb';
   const titleColor = isDark ? 'white' : '#111827';
   const subtitleColor = isDark ? '#9ca3af' : '#6b7280';
+  const iconColor = isDark ? '#9ca3af' : '#6b7280';
+  const menuBgColor = isDark ? '#2d2d2d' : 'white';
   const buttonTextColor = isDark ? '#e5e7eb' : '#374151';
   const buttonBorderColor = isDark ? '#4b5563' : '#d1d5db';
-  const buttonHoverBorderColor = isDark ? '#6b7280' : '#9ca3af';
   const searchBgColor = isDark ? '#374151' : '#f9fafb';
-  const iconColor = isDark ? '#9ca3af' : '#6b7280';
-  const hoverBgColor = isDark ? '#374151' : '#f9fafb';
-  const menuBgColor = isDark ? '#2d2d2d' : 'white';
+
+  // Sécuriser l'accès au tableau avant le slice
+  const safeNotifications = Array.isArray(notifications) ? notifications : [];
+  const recentNotifications = safeNotifications.slice(0, 5);
 
   return (
     <AppBar 
@@ -71,58 +72,27 @@ export const Header = ({
       }}
     >
       <Toolbar sx={{ px: { xs: 2, md: 3 }, minHeight: '64px !important' }}>
-        {/* Menu button pour mobile */}
         <IconButton
           edge="start"
           onClick={onMenuClick}
-          sx={{ 
-            mr: 2, 
-            display: { xs: 'flex', md: 'none' },
-            color: titleColor,
-            transition: 'color 0.3s ease'
-          }}
+          sx={{ mr: 2, display: { xs: 'flex', md: 'none' }, color: titleColor }}
         >
           <MenuIcon />
         </IconButton>
 
-        {/* Titre et sous-titre */}
         <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-          <Typography 
-            variant="h5" 
-            sx={{ 
-              fontWeight: 600, 
-              color: titleColor,
-              fontSize: { xs: '1.25rem', md: '1.5rem' },
-              transition: 'color 0.3s ease'
-            }}
-          >
+          <Typography variant="h5" sx={{ fontWeight: 600, color: titleColor, fontSize: { xs: '1.25rem', md: '1.5rem' } }}>
             {title}
           </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: subtitleColor,
-              display: { xs: 'none', sm: 'block' },
-              transition: 'color 0.3s ease'
-            }}
-          >
+          <Typography variant="body2" sx={{ color: subtitleColor, display: { xs: 'none', sm: 'block' } }}>
             {subtitle}
           </Typography>
         </Box>
 
-        {/* Section droite avec contrôles */}
-        <Box sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: { xs: 1, md: 2 },
-          flexShrink: 0
-        }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, md: 2 } }}>
+          
           {/* Période et Export (desktop uniquement) */}
-          <Box sx={{ 
-            display: { xs: 'none', lg: 'flex' }, 
-            alignItems: 'center', 
-            gap: 1 
-          }}>
+          <Box sx={{ display: { xs: 'none', lg: 'flex' }, alignItems: 'center', gap: 1 }}>
             <Button
               variant="outlined"
               startIcon={<CalendarToday />}
@@ -133,7 +103,7 @@ export const Header = ({
                 color: buttonTextColor,
                 transition: 'all 0.3s ease',
                 '&:hover': {
-                  borderColor: buttonHoverBorderColor,
+                  borderColor: buttonBorderColor,
                   backgroundColor: isDark ? '#374151' : 'rgba(0,0,0,0.04)'
                 }
               }}
@@ -150,7 +120,7 @@ export const Header = ({
                 color: buttonTextColor,
                 transition: 'all 0.3s ease',
                 '&:hover': {
-                  borderColor: buttonHoverBorderColor,
+                  borderColor: buttonBorderColor,
                   backgroundColor: isDark ? '#374151' : 'rgba(0,0,0,0.04)'
                 }
               }}
@@ -158,180 +128,118 @@ export const Header = ({
               Export
             </Button>
           </Box>
+          
 
           {/* Barre de recherche (desktop) */}
           <TextField
             size="small"
-            placeholder="What are you looking for?"
-            sx={{ 
-              display: { xs: 'none', lg: 'block' },
-              width: '240px'
-            }}
+            placeholder="Rechercher..."
+            sx={{ display: { xs: 'none', lg: 'block' }, width: '200px' }}
             InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search sx={{ 
-                    color: iconColor, 
-                    fontSize: '1.25rem',
-                    transition: 'color 0.3s ease'
-                  }} />
-                </InputAdornment>
-              ),
-              sx: {
-                backgroundColor: searchBgColor,
-                color: isDark ? 'white' : 'inherit',
-                transition: 'all 0.3s ease',
-                '& .MuiOutlinedInput-notchedOutline': {
-                  border: 'none'
-                },
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  border: 'none'
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  border: '1px solid #6366f1'
-                },
-                '& input::placeholder': {
-                  color: iconColor,
-                  opacity: 1
-                }
-              }
+              startAdornment: (<InputAdornment position="start"><Search sx={{ color: iconColor }} /></InputAdornment>),
+              sx: { backgroundColor: searchBgColor, color: titleColor, '& fieldset': { border: 'none' } }
             }}
           />
 
-          {/* Notifications */}
-          <IconButton
-            onClick={handleNotificationClick}
-            sx={{ 
-              color: iconColor,
-              transition: 'color 0.3s ease'
-            }}
-          >
-            <Badge badgeContent={3} color="error">
+          {/* --- NOTIFICATIONS --- */}
+          <IconButton onClick={handleNotificationClick} sx={{ color: iconColor }}>
+            <Badge badgeContent={unreadCount} color="error">
               <Notifications />
             </Badge>
           </IconButton>
 
-          {/* Profile */}
+          {/* --- PROFILE --- */}
           <Box 
             onClick={handleProfileClick}
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              cursor: 'pointer',
-              padding: '4px 8px',
-              borderRadius: '8px',
-              transition: 'background-color 0.3s ease',
-              '&:hover': {
-                backgroundColor: hoverBgColor
-              }
+              display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer',
+              padding: '4px 8px', borderRadius: '8px',
+              '&:hover': { backgroundColor: isDark ? '#374151' : '#f9fafb' }
             }}
           >
-            <Avatar 
-              sx={{ width: 32, height: 32 }}
-              alt="User Avatar"
-            />
+            <Avatar sx={{ width: 32, height: 32 }} />
             <Box sx={{ display: { xs: 'none', md: 'block' } }}>
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  fontWeight: 500, 
-                  color: titleColor, 
-                  lineHeight: 1.2,
-                  transition: 'color 0.3s ease'
-                }}
-              >
-                Ando Razafy
-              </Typography>
-              <Typography 
-                variant="caption" 
-                sx={{ 
-                  color: subtitleColor, 
-                  lineHeight: 1.2,
-                  transition: 'color 0.3s ease'
-                }}
-              >
-                andorazafymanantso@gmail.com
-              </Typography>
+              <Typography variant="body2" sx={{ fontWeight: 500, color: titleColor }}>Mon Compte</Typography>
             </Box>
-            <KeyboardArrowDown sx={{ 
-              color: iconColor,
-              transition: 'color 0.3s ease'
-            }} />
+            <KeyboardArrowDown sx={{ color: iconColor }} />
           </Box>
         </Box>
 
-        {/* Menu profil */}
+        {/* Menu Profil */}
         <Menu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
           onClose={handleClose}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
-          PaperProps={{
-            sx: {
-              backgroundColor: menuBgColor,
-              color: isDark ? 'white' : 'inherit',
-              border: `1px solid ${borderColor}`,
-              transition: 'all 0.3s ease',
-              '& .MuiMenuItem-root': {
-                color: isDark ? 'white' : 'inherit',
-                '&:hover': {
-                  backgroundColor: isDark ? '#374151' : 'rgba(0,0,0,0.04)'
-                }
-              }
-            }
-          }}
+          PaperProps={{ sx: { bgcolor: menuBgColor, color: titleColor, border: `1px solid ${borderColor}` } }}
         >
-          <MenuItem onClick={handleClose}>Profile</MenuItem>
-          <MenuItem onClick={handleClose}>Settings</MenuItem>
-          <MenuItem onClick={handleClose}>Logout</MenuItem>
+          <MenuItem onClick={() => { handleClose(); navigate('/settings'); }}>Paramètres</MenuItem>
+          <MenuItem onClick={handleClose}>Déconnexion</MenuItem>
         </Menu>
 
-        {/* Menu notifications */}
+        {/* --- MENU NOTIFICATIONS DYNAMIQUE --- */}
         <Menu
           anchorEl={notificationAnchor}
           open={Boolean(notificationAnchor)}
           onClose={handleClose}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
+          PaperProps={{ 
+            sx: { 
+              width: 320, 
+              maxHeight: 480, 
+              bgcolor: menuBgColor, 
+              color: titleColor, 
+              border: `1px solid ${borderColor}` 
+            } 
           }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
-          PaperProps={{
-            sx: {
-              backgroundColor: menuBgColor,
-              color: isDark ? 'white' : 'inherit',
-              border: `1px solid ${borderColor}`,
-              transition: 'all 0.3s ease',
-              '& .MuiMenuItem-root': {
-                color: isDark ? 'white' : 'inherit',
-                '&:hover': {
-                  backgroundColor: isDark ? '#374151' : 'rgba(0,0,0,0.04)'
-                }
-              }
-            }
-          }}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
-          <MenuItem onClick={handleClose}>
-            <Typography variant="body2">New transaction received</Typography>
-          </MenuItem>
-          <MenuItem onClick={handleClose}>
-            <Typography variant="body2">Weekly report available</Typography>
-          </MenuItem>
-          <MenuItem onClick={handleClose}>
-            <Typography variant="body2">Account limit reached</Typography>
+          <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Typography variant="subtitle2" fontWeight={600}>Notifications</Typography>
+            {unreadCount > 0 && (
+              <IconButton size="small" onClick={markAllAsRead} title="Tout marquer comme lu">
+                <DoneAll fontSize="small" color="primary" />
+              </IconButton>
+            )}
+          </Box>
+          <Divider sx={{ borderColor: borderColor }} />
+          
+          {safeNotifications.length === 0 ? (
+            <Box sx={{ p: 4, textAlign: 'center' }}>
+               <Typography variant="body2" color="text.secondary">Aucune notification récente</Typography>
+            </Box>
+          ) : (
+            recentNotifications.map((notif) => (
+              <MenuItem 
+                key={notif.id} 
+                onClick={handleViewAllNotifications} 
+                sx={{ 
+                  whiteSpace: 'normal', 
+                  borderLeft: notif.read ? 'none' : `3px solid #6366f1`,
+                  bgcolor: notif.read ? 'transparent' : (isDark ? 'rgba(99, 102, 241, 0.08)' : 'rgba(25, 118, 210, 0.04)')
+                }}
+              >
+                <ListItemText 
+                  primary={notif.title || notif.type} 
+                  secondary={
+                    <>
+                      <Typography component="span" variant="body2" display="block" color="text.primary" sx={{ my: 0.5 }}>
+                        {notif.message}
+                      </Typography>
+                      <Typography component="span" variant="caption" color="text.secondary">
+                        {new Date(notif.created_at).toLocaleDateString()}
+                      </Typography>
+                    </>
+                  }
+                />
+              </MenuItem>
+            ))
+          )}
+          <Divider sx={{ borderColor: borderColor }} />
+          <MenuItem onClick={handleViewAllNotifications} sx={{ justifyContent: 'center', color: 'primary.main', fontWeight: 600 }}>
+            Voir tout l'historique
           </MenuItem>
         </Menu>
+
       </Toolbar>
     </AppBar>
   );
