@@ -4,17 +4,19 @@ export const accountsService = {
   getAccountDetails: (id, includePercentages = false, comparisonDays = 7) => {
     return request(`/accounts/${id}/details`, {
       params: {
-        includePercentages: includePercentages, // Inclure les pourcentages de variation
-        comparisonDays: comparisonDays // Comparer avec les 7 derniers jours
+        includePercentages,
+        comparisonDays
       }
     });
   },
 
   getAccountAnalysis: (id, filter = {}) => {
     const params = new URLSearchParams(filter).toString();
-    const url = params
-      ? `/accounts/${id}/analysis?${params}`
-      : `/accounts/${id}/analysis`;
+    const url = params ? `/accounts/${id}/analysis?${params}` : `/accounts/${id}/analysis`;
     return request(url);
   },
+
+  // new: get raw account and update account
+  getAccount: (id) => request(`/accounts/${id}`),
+  updateAccount: (id, data) => request(`/accounts/${id}`, { method: 'PUT', data }),
 };

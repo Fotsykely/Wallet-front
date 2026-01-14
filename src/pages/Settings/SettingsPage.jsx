@@ -11,6 +11,7 @@ import {
 import { useOutletContext } from 'react-router-dom';
 import { useNotifier } from '@/components/ui/notifications/NotifierContext';
 import { settingsService } from '@/services/api/settings';
+import { accountsService } from '@/services/api/account';
 
 export default function SettingsPage() {
   const { isDark } = useOutletContext();
@@ -25,16 +26,20 @@ export default function SettingsPage() {
 
   // Charger l'email depuis le backend au montage
   useEffect(() => {
-    settingsService.getSettings().then(data => {
-      if (data.user_email) setEmail(data.user_email);
-      // Si vous stockez d'autres prefs en base, chargez-les ici
+    // prefer account.email if present
+    accountsService.getAccount(1).then(acc => {
+      if (acc && acc.email) setEmail(acc.email);
+      else settingsService.getSettings().then(data => { if (data.user_email) setEmail(data.user_email); });
+    }).catch(() => {
+      settingsService.getSettings().then(data => { if (data.user_email) setEmail(data.user_email); });
     });
   }, []);
 
   const handleSaveProfile = async () => {
     try {
       setLoading(true);
-      await settingsService.saveSetting('user_email', email);
+      // save on account (primary account id = 1)
+      await accountsService.updateAccount(1, { email });
       show('Email sauvegardé avec succès', 'success');
     } catch (err) {
       show('Erreur lors de la sauvegarde', 'error');
