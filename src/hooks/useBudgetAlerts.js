@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { settingsService } from '@/services/api/settings';
 import { useNotifier } from '@/components/ui/notifications/NotifierContext';
+import { PREF_KEYS, SESSION_KEYS } from '@/constants/settings';
 
 const ALERT_THRESHOLD = 0.8; // 80%
-const STORAGE_KEY_PREFIX = 'wallet_alert_shown_';
 
 /**
  * Hook responsable de vérifier si le budget est en danger.
@@ -22,7 +22,7 @@ export function useBudgetAlerts(spent, budget, month) {
       .then(settings => {
         if (mounted) {
           // Save in the state if budget alerts are enabled
-          setIsEnabled(settings.pref_budget_alerts === 'true');
+          setIsEnabled(settings[PREF_KEYS.BUDGET_ALERTS] === 'true');
         }
       })
       .catch(console.error);
@@ -34,7 +34,7 @@ export function useBudgetAlerts(spent, budget, month) {
     if (!isEnabled || !budget || budget <= 0 || !month) return;
 
     const ratio = spent / budget;
-    const sessionKey = `${STORAGE_KEY_PREFIX}${month}`;
+    const sessionKey = `${SESSION_KEYS.BUDGET_ALERT_SHOWN}${month}`;
     const alreadyNotified = sessionStorage.getItem(sessionKey);
 
     // Case 1: Budget exceeded

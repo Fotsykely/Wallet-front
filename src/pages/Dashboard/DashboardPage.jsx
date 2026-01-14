@@ -1,17 +1,16 @@
 /* eslint-disable no-unused-vars */
 // pages/Dashboard/DashboardPage.jsx
-import { useState, useEffect, useMemo } from 'react';
+import { useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useDashboardData } from '@/hooks/useDashboardData';
+import { useBudgetAlerts } from '@/hooks/useBudgetAlerts';
 import { IncomeCard } from '../../components/cards/IncomeCard';
 import { OutcomeCard } from '../../components/cards/OutcomeCard';
 import { SummaryCard } from '../../components/cards/SummaryCard';
-import { useOutletContext } from 'react-router-dom';
 import { WeeklyAnalysisChart } from '../../components/charts/WeeklyAnalysisChart';
 import { RecentTransactionsCard } from '../../components/cards/RecentTransactionsCard';
-import { accountsService } from '@/services/api/account';
-import { transactionService } from '@/services/api/transaction';
-import { budgetService } from '@/services/api/budget';
-import { useBudgetAlerts } from '@/hooks/useBudgetAlerts'; 
+
 // Animation de fade-in et slide-up
 const fadeInUp = {
   initial: { opacity: 0, y: 40 },
@@ -21,59 +20,21 @@ const fadeInUp = {
 
 export const DashboardPage = () => {
   const { theme, isDark } = useOutletContext();
-  const [accountData, setAccountData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [budgetData, setBudgetData] = useState(null);
-  const [analysisData, setAnalysisData] = useState([]);
-  
-  // 1. AJOUTER L'ÉTAT POUR LES TRANSACTIONS
-  const [recentTransactions, setRecentTransactions] = useState([]);
-
-  const currentMonth = useMemo(() => {
-    const now = new Date();
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-  }, []);
-
-  // Données temporaires - à remplacer par vos appels API
-  useEffect(() => {
-    accountsService.getAccountDetails(1, true)
-      .then(setAccountData)
-      .catch(() => setAccountData(null))
-      .finally(() => setLoading(false));
-  }, []);
-
-  useEffect(() => {
-    transactionService.getAccountTransaction(1, { maxDate: 5 })
-      .then(setRecentTransactions)
-      .catch((err) => {
-        console.error(err);
-        setRecentTransactions([]);
-      });
-  }, []);
-
-  useEffect(() => {
-    accountsService.getAccountAnalysis(1, { maxDate: 7 })
-      .then(setAnalysisData)
-      .catch(() => setAnalysisData([]));
-  }, []);
-
-  useEffect(() => {
-    // Get Budget for current month in YYYY-MM format
-    const now = new Date();
-    const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    budgetService.getBudget(1, month)
-      .then(setBudgetData)
-      .catch(() => setBudgetData(null));
-  }, []);
-
   const [showChart, setShowChart] = useState(false);
+  
+  // Toute la logique de fetch est maintenant ici :
+  const { 
+    loading, accountData, recentTransactions, 
+    analysisData, budgetData, currentMonth 
+  } = useDashboardData();
 
   const budgetAmount = budgetData?.amount || 0;
   const expense = Math.abs(accountData?.expense || 0);
-  
-  // Utilisation du Hook : Une seule ligne pour gérer toute la logique d'alerte
+
+  // Hook d'effets secondaires (alertes)
   useBudgetAlerts(expense, budgetAmount, currentMonth);
 
+  // Calculs de présentation (Restent ici car liés à l'UI)
   const remaining = budgetAmount - expense;
   const percentUsed = budgetAmount > 0 ? Math.min((expense / budgetAmount) * 100, 100) : 0;
 
