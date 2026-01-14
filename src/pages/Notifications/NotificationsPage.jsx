@@ -1,8 +1,9 @@
 /* eslint-disable no-unused-vars */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   Box, Typography, List, ListItem, ListItemAvatar, 
   ListItemText, Avatar, IconButton, Paper, Chip, Button
+  , Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions
 } from '@mui/material';
 import { 
   AccountBalanceWallet, Warning, CheckCircle, 
@@ -15,15 +16,41 @@ import { AnimatePresence, motion } from 'framer-motion';
 export default function NotificationsPage() {
   const { isDark } = useOutletContext();
   
-  // 1. AJOUT DE VALEURS PAR DÉFAUT pour éviter le crash si le contexte est vide
+  // AJOUT DE VALEURS PAR DÉFAUT pour éviter le crash si le contexte est vide
   const { 
     notifications = [], 
+    markAsRead = () => {},   
     markAllAsRead = () => {}, 
     deleteNotification = () => {}, 
     clearAll = () => {},
     unreadCount = 0,
-    show = () => {}
+    show = () => {},
+    refreshNotifications
   } = useNotifier() || {};
+  
+  // Automatic refresh on opening the page
+  useEffect(() => {
+    if (typeof refreshNotifications === 'function') refreshNotifications();
+  }, [refreshNotifications]);
+
+  // Modal to show notification details and make as read
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedNotif, setSelectedNotif] = useState(null);
+
+  const handleOpen = (notif) => {
+    setSelectedNotif(notif);
+    setOpenDialog(true);
+  };
+  const handleClose = () => {
+    setSelectedNotif(null);
+    setOpenDialog(false);
+  };
+  const handleMarkAsRead = async () => {
+    if (!selectedNotif) return;
+    await markAsRead(selectedNotif.id);
+    show('Notification marquée comme lue', 'success', { skipHistory: true });
+    handleClose();
+  };
 
   // 2. SÉCURISATION : On s'assure que c'est bien un tableau
   const safeNotifications = Array.isArray(notifications) ? notifications : [];
@@ -130,6 +157,7 @@ export default function NotificationsPage() {
                 transition={{ duration: 0.2 }}
               >
                 <ListItem
+                  button
                   alignItems="flex-start"
                   sx={{ 
                     bgcolor: notif.read ? 'transparent' : (isDark ? 'rgba(99, 102, 241, 0.08)' : 'rgba(25, 118, 210, 0.04)'),
@@ -138,10 +166,11 @@ export default function NotificationsPage() {
                     '&:hover': { bgcolor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)' }
                   }}
                   secondaryAction={
-                    <IconButton edge="end" onClick={() => handleDelete(notif.id)} title="Supprimer">
+                    <IconButton edge="end" onClick={(e) => { e.stopPropagation(); handleDelete(notif.id); }} title="Supprimer">
                       <DeleteOutline fontSize="small" />
                     </IconButton>
                   }
+                  onClick={() => handleOpen(notif)}
                 >
                   <ListItemAvatar>
                     <Avatar sx={{ bgcolor: isDark ? '#27272a' : '#f5f5f5' }}>
@@ -171,6 +200,22 @@ export default function NotificationsPage() {
           </AnimatePresence>
         </List>
       </Paper>
-    </Box>
-  );
-}
+
+      <Dialog open={openDialog} onClose={handleClose}>
+        <DialogTitle>{selectedNotif?.title || 'Notification'}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {selectedNotif?.message}
+          </DialogContentText>
+          <Box mt={1} color="text.secondary" fontSize="0.85rem">
+            {selectedNotif?.created_at ? formatDate(selectedNotif.created_at) : ''}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Fermer</Button>
+          <Button onClick={handleMarkAsRead} color="primary" variant="contained">Marquer comme lu</Button>
+        </DialogActions>
+      </Dialog>
+     </Box>
+   );
+ }

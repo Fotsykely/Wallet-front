@@ -1,32 +1,25 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import { Snackbar, Alert, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { NotifierContext } from './NotifierContext'; // Importez le contexte ici
+import { NotifierContext, NotifierController } from './NotifierContext';
 
 export const NotificationProvider = ({ children }) => {
-  const [state, setState] = useState({
-    open: false, message: '', severity: 'success', autoHide: 3000,
-    anchorOrigin: { vertical: 'bottom', horizontal: 'center' }
-  });
-
-  const show = useCallback((message, severity = 'success', options = {}) => {
-    setState(s => ({ ...s, open: true, message, severity, ...options }));
-  }, []);
-
-  const hide = useCallback(() => setState(s => ({ ...s, open: false })), []);
+  // Récupère le controller (utilise les hooks internes)
+  const controller = NotifierController();
+  const { snackbar = {}, hide } = controller;
 
   return (
-    <NotifierContext.Provider value={{ show, hide }}>
+    <NotifierContext.Provider value={controller}>
       {children}
       <Snackbar
-        open={state.open}
-        autoHideDuration={state.autoHide}
+        open={!!snackbar.open}
+        autoHideDuration={snackbar.autoHide}
         onClose={hide}
-        anchorOrigin={state.anchorOrigin}
+        anchorOrigin={snackbar.anchorOrigin || { vertical: 'bottom', horizontal: 'center' }}
       >
         <Alert
           onClose={hide}
-          severity={state.severity}
+          severity={snackbar.severity || 'success'}
           sx={{ width: '100%' }}
           action={
             <IconButton size="small" aria-label="close" color="inherit" onClick={hide}>
@@ -34,7 +27,7 @@ export const NotificationProvider = ({ children }) => {
             </IconButton>
           }
         >
-          {state.message}
+          {snackbar.message}
         </Alert>
       </Snackbar>
     </NotifierContext.Provider>

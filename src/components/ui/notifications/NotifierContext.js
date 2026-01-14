@@ -32,6 +32,14 @@ export const NotifierController = () => {
     refreshNotifications();
   }, [refreshNotifications]);
 
+  // Periodic refresh every 7 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      refreshNotifications();
+    }, 7000); // Every 7 seconds
+    return () => clearInterval(timer);
+  }, [refreshNotifications]);
+  
   /**
    * Afficher une notification
    */
@@ -98,6 +106,7 @@ export const NotifierController = () => {
     markAsRead,
     markAllAsRead,
     deleteNotification,
-    clearAll
+    clearAll,
+    refreshNotifications
   };
 };

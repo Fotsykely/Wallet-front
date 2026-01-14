@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { 
   AppBar, Toolbar, IconButton, Typography, Box, Avatar, 
   TextField, InputAdornment, Badge, Menu, MenuItem, 
@@ -93,7 +94,7 @@ export const Header = ({
           
           {/* Période et Export (desktop uniquement) */}
           <Box sx={{ display: { xs: 'none', lg: 'flex' }, alignItems: 'center', gap: 1 }}>
-            <Button
+            {/* <Button
               variant="outlined"
               startIcon={<CalendarToday />}
               size="small"
@@ -126,12 +127,12 @@ export const Header = ({
               }}
             >
               Export
-            </Button>
+            </Button> */}
           </Box>
           
 
           {/* Barre de recherche (desktop) */}
-          <TextField
+          {/* <TextField
             size="small"
             placeholder="Rechercher..."
             sx={{ display: { xs: 'none', lg: 'block' }, width: '200px' }}
@@ -139,7 +140,7 @@ export const Header = ({
               startAdornment: (<InputAdornment position="start"><Search sx={{ color: iconColor }} /></InputAdornment>),
               sx: { backgroundColor: searchBgColor, color: titleColor, '& fieldset': { border: 'none' } }
             }}
-          />
+          /> */}
 
           {/* --- NOTIFICATIONS --- */}
           <IconButton onClick={handleNotificationClick} sx={{ color: iconColor }}>
