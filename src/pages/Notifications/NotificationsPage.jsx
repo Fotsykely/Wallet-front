@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import { 
   Box, Typography, List, ListItem, ListItemAvatar, 
@@ -9,7 +10,7 @@ import {
 } from '@mui/icons-material';
 import { useOutletContext } from 'react-router-dom';
 import { useNotifier } from '@/components/ui/notifications/NotifierContext';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const MOCK_NOTIFICATIONS = [
   { id: 1, type: 'warning', title: 'Budget dépassé', message: 'Vous avez dépassé 80% de votre budget Alimentation.', date: 'Il y a 2 heures', read: false },
